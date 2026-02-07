@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simple Products · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="simple-products">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Products / Simple Products</nav>
+        <div class="page-eyebrow">Products</div>
+        <h1 class="page-title">Simple Products</h1>
+        <p class="page-intro">The free Kitbix Commerce plugin treats every item as a “simple” SKU with name, description, price, gallery, stock, status, and categories. There are no hidden product types or variation editors.</p>
+
+        <section>
+          <h2 class="section-title">Editor fields</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>UI location</th>
+                  <th>Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>Top of the form</td>
+                  <td>Required. Saved into <code>products.name</code> and reused for the slug if you leave the slug blank.</td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td>Rich text editor</td>
+                  <td>HTML stored via <code>wp_kses_post</code>, rendered on product cards and detail page.</td>
+                </tr>
+                <tr>
+                  <td>Price / Sale Price</td>
+                  <td>Pricing row</td>
+                  <td>Plain decimal inputs mapped to <code>price</code> and <code>sale_price</code>. There are no schedule fields—update manually when promotions start/end.</td>
+                </tr>
+                <tr>
+                  <td>Stock</td>
+                  <td>Inventory row</td>
+                  <td>Integer quantity surfaced as “In stock (x available)” on the grid.</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td>Dropdown near the save buttons</td>
+                  <td><code>published</code> items show publicly; <code>draft</code> stays hidden but editable.</td>
+                </tr>
+                <tr>
+                  <td>Gallery Images</td>
+                  <td>Media picker row</td>
+                  <td>Stores an ordered array of URLs in <code>products.gallery</code>. First image becomes the thumbnail if “Image” is empty.</td>
+                </tr>
+                <tr>
+                  <td>Categories</td>
+                  <td>Sidebar + “Manage Categories” modal</td>
+                  <td>Selections are passed as ID arrays and synced with <code>Category::syncProductCategories()</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Saving flow</h2>
+          <ol>
+            <li>Hit “Add Product” or “Edit” from the admin list.</li>
+            <li>Fill out the form shown in the screenshots (name, description, price, stock, gallery).</li>
+            <li>Assign categories or open “Manage Categories” to create new nodes (CategoryController enforces unique slugs).</li>
+            <li>Click Save/Update. The SPA calls <code>ProductController::store()</code> or <code>update()</code>, which sanitizes data, saves timestamps, and emits <code>kitbix_commerce_product_saved</code>.</li>
+            <li>Reload the storefront grid to confirm the new card or edits render immediately.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use descriptive slugs (e.g., <code>combo-bean-bag</code>) so product permalinks remain readable and friendly.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep sale price blank when not on promotion—templates automatically hide the strike-through price.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Trying to upload variation data—the free plugin doesn’t have attributes/variations. Create distinct products instead.</li>
+            <li>Leaving the status on Draft and expecting it to appear on the storefront.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> REST imports overwrite gallery JSON and category pivots. Back up tables or run imports in staging first.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

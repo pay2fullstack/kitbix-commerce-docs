@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Database Schema · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="database-schema">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Developers / Database Schema</nav>
+        <div class="page-eyebrow">Developers</div>
+        <h1 class="page-title">Database Schema</h1>
+        <p class="page-intro">Kitbix Commerce prefixes every table with <code>{$wpdb-&gt;prefix}kitbix_commerce_*</code> and creates them via dbDelta migrations inside <code>/database/migrations</code>. Use the table map below before joining or mutating data.</p>
+
+        <section>
+          <h2 class="section-title">Migration basics</h2>
+          <ul>
+            <li><code>Core\Database::migrate()</code> runs on plugin activation and loads each PHP file in <code>database/migrations</code>.</li>
+            <li>Each migration returns a closure that calls <code>dbDelta()</code>. Tables use <code>utf8mb4</code> + <code>InnoDB</code> collations by default.</li>
+            <li>Addon-specific tables (e.g., Product Q&amp;A) maintain their own version option and rerun installs only when needed.</li>
+            <li>Never rename Kitbix tables manually—future migrations assume the original structure.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Table reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>Schema highlights</th>
+                  <th>Defined in</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>kitbix_commerce_products</code></td>
+                  <td>
+                    <ul>
+                      <li><code>id</code> PK, <code>name</code>, <code>slug</code> (unique)</li>
+                      <li>Pricing: <code>price</code>, <code>sale_price</code></li>
+                      <li>Status + stock: <code>status</code> (draft/published), <code>stock</code></li>
+                      <li>Media: <code>image</code>, <code>gallery</code> JSON</li>
+                    </ul>
+                  </td>
+                  <td><code>create_products_table.php</code></td>
+                  <td>Used by <code>Product</code> model and <code>ProductController</code>. Always update timestamps (<code>created_at</code>/<code>updated_at</code>).</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_categories</code></td>
+                  <td>Name + slug columns with optional parent <code>BIGINT</code>.</td>
+                  <td><code>create_categories_table.php</code></td>
+                  <td>Hierarchical tree for storefront filters.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_category_product</code></td>
+                  <td>Pivot table: <code>product_id</code>, <code>category_id</code>, composite unique key.</td>
+                  <td><code>create_category_product_table.php</code></td>
+                  <td>Maintained via <code>Category::syncProductCategories()</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_orders</code></td>
+                  <td>
+                    <ul>
+                      <li>Monetary columns: <code>subtotal</code>, <code>tax_total</code>, <code>shipping_total</code>, <code>total</code></li>
+                      <li>Status fields: <code>payment_status</code>, <code>order_status</code></li>
+                      <li>Customer columns: <code>customer_name</code>, <code>customer_email</code>, <code>customer_address</code></li>
+                    </ul>
+                  </td>
+                  <td><code>create_orders_table.php</code></td>
+                  <td>Referenced by <code>Order</code> model, Analytics queries, and REST controllers.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_order_items</code></td>
+                  <td><code>order_id</code>, <code>product_id</code>, per-line <code>price</code> + <code>quantity</code>.</td>
+                  <td><code>create_order_items_table.php</code></td>
+                  <td>Used for order timelines and analytics timeline buckets.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_meta</code></td>
+                  <td>Generic key/value table with <code>parent</code>, <code>parent_id</code>, <code>meta_key</code>, <code>meta_value</code>.</td>
+                  <td><code>create_meta_table.php</code></td>
+                  <td>Stores addon configuration or product metadata without schema changes.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_product_qna</code></td>
+                  <td>Addon table: <code>product_id</code>, <code>question</code>, <code>answer</code>, <code>status</code>.</td>
+                  <td><code>ProductQnaInstaller::install()</code></td>
+                  <td>Versioned via option <code>kitbix_commerce_product_qna_db_version</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Working with data</h2>
+          <ul>
+            <li>Use <code>KitbixCommerce\Core\Database::table('orders')</code> to construct the correct prefixed table name.</li>
+            <li>Models expose helper methods (<code>Order::adminPaginate()</code>, <code>Product::create()</code>)—reuse them instead of writing raw SQL where possible.</li>
+            <li>If you must write custom queries, always call <code>$wpdb-&gt;prepare()</code> and respect multisite prefixes.</li>
+            <li>Analytics dashboards run aggregate SQL; keep those queries fast by indexing your custom columns the same way.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Mirror Kitbix timestamps by setting <code>current_time('mysql')</code> for <code>created_at</code>/<code>updated_at</code>.</div>
+          <div class="callout tip"><strong>Tip:</strong> For analytics/reporting, create SQL views or replica tables rather than joining directly on production orders.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Hardcoding <code>wp_</code> as the table prefix—always call the Database helper.</li>
+            <li>Deleting rows without cascading to related tables (e.g., removing an order without deleting <code>order_items</code>).</li>
+            <li>Running <code>ALTER TABLE</code> statements on Kitbix tables; changes will be lost on the next migration run.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Back up the database before writing scripts. dbDelta migrations expect the default structure; diverging from it may break updates.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>REST API · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="rest-api">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Developers / REST API</nav>
+        <div class="page-eyebrow">Developers</div>
+        <h1 class="page-title">REST API</h1>
+        <p class="page-intro">Kitbix Commerce registers JSON routes under <code>/wp-json/kitbix-commerce/v1</code>. Admin endpoints require WordPress capabilities plus REST nonces; public endpoints power checkout, payments, and storefront data.</p>
+
+        <section>
+          <h2 class="section-title">Authentication & headers</h2>
+          <ul>
+            <li><strong>Admin routes</strong> (declared in <code>routes/admin.php</code>) check <code>current_user_can('manage_options')</code>. Send <code>X-WP-Nonce: wp_create_nonce('wp_rest')</code> with your cookies.</li>
+            <li><strong>Public routes</strong> (<code>/products</code>, <code>/checkout</code>, <code>/payments/*</code>) skip capability checks but still expect a valid REST nonce to avoid CSRF.</li>
+            <li>All controllers call <code>$request-&gt;get_json_params()</code>, so set <code>Content-Type: application/json</code> and provide UTF-8 encoded JSON.</li>
+            <li>Construct URLs with <code>home_url('wp-json/kitbix-commerce/v1/...')</code> to stay multisite-safe.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Admin endpoints</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>Controller</th>
+                  <th>Summary</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>GET /admin/products</code></td>
+                  <td><code>ProductController::index</code></td>
+                  <td>Paginated list (<code>page</code>, <code>per_page</code>, <code>status</code>, <code>search</code>).</td>
+                </tr>
+                <tr>
+                  <td><code>POST /admin/products</code></td>
+                  <td><code>ProductController::store</code></td>
+                  <td>Create products; body mirrors admin editor fields, fires <code>kitbix_commerce_product_saved</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>PUT /admin/products/&lt;id&gt;</code></td>
+                  <td><code>ProductController::update</code></td>
+                  <td>Update fields + categories. Requires <code>id</code> param and nonce.</td>
+                </tr>
+                <tr>
+                  <td><code>GET /admin/orders</code></td>
+                  <td><code>OrderController::index</code></td>
+                  <td>Order list with <code>status</code>/<code>search</code> filters and pagination meta.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /admin/orders/&lt;id&gt;/status</code></td>
+                  <td><code>OrderController::updateStatus</code></td>
+                  <td>Updates <code>order_status</code>/<code>payment_status</code>; triggers notification emails.</td>
+                </tr>
+                <tr>
+                  <td><code>GET /admin/categories</code></td>
+                  <td><code>CategoryController::index</code></td>
+                  <td>Returns category tree + pagination for the React admin modal.</td>
+                </tr>
+                <tr>
+                  <td><code>POST /admin/addons</code></td>
+                  <td><code>AddonsController::update</code></td>
+                  <td>Toggle addons and persist settings using <code>AddonRegistry</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>GET /admin/analytics</code></td>
+                  <td><code>AnalyticsController::index</code></td>
+                  <td>Accepts <code>range</code> presets (24h, 7d, 1m, 6m, 1y, all, custom) plus optional <code>start_date</code>/<code>end_date</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Public storefront routes</h2>
+          <ul>
+            <li><code>GET /products</code> → <code>ProductController::publicIndex</code>. Supports <code>page</code>, <code>per_page</code>, <code>search</code>, <code>category</code>.</li>
+            <li><code>POST /checkout</code> → <code>OrderController::checkout</code>. Body requires <code>customer</code>, <code>items</code> ({<code>product_id</code>, <code>quantity</code>}), <code>payment_method</code>, optional <code>payment_intent_id</code>.</li>
+            <li><code>POST /payments/{gateway}/initiate|complete|webhook</code> → <code>PaymentController</code>. Used by Stripe/PayPal adapters and custom gateways.</li>
+          </ul>
+          <pre><code class="language-json">POST /wp-json/kitbix-commerce/v1/checkout
+{
+  "customer": {"name": "Jane", "email": "jane@example.com"},
+  "items": [{"product_id": 42, "quantity": 2}],
+  "payment_method": "cod"
+}</code></pre>
+        </section>
+
+        <section>
+          <h2 class="section-title">Pagination & errors</h2>
+          <ul>
+            <li>List endpoints return <code>{ items, meta: { total, per_page, current_page, total_pages } }</code>.</li>
+            <li>Validation issues respond with <code>WP_Error</code> (status 422). Permissions → 403. Not found → 404.</li>
+            <li>Keep <code>per_page</code> ≤ 50 and paginate through <code>page</code> values when syncing large datasets.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Mirror controller sanitization (<code>sanitize_text_field</code>, <code>sanitize_key</code>, <code>current_time</code>) in your integrations to avoid 422 errors.</div>
+          <div class="callout tip"><strong>Tip:</strong> Run imports/exports through queues (Action Scheduler, cron) to prevent HTTP timeouts.</div>
+          <div class="callout tip"><strong>Tip:</strong> Log webhook payloads—Stripe/PayPal will retry when Kitbix returns non-2xx responses.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Omitting <code>X-WP-Nonce</code> on admin requests.</li>
+            <li>Hardcoding domains instead of reading <code>home_url()</code>.</li>
+            <li>Sending form-encoded payloads to JSON endpoints.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Never expose REST nonces or cookies in frontend bundles. Proxy sensitive calls through WordPress or a server-side helper that can mint nonces securely.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

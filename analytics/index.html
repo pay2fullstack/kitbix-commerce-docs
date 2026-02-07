@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Analytics Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="analytics">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Analytics / Overview</nav>
+        <div class="page-eyebrow">Analytics</div>
+        <h1 class="page-title">Analytics Overview</h1>
+        <p class="page-intro">Kitbix Commerce ships with a zero-config analytics dashboard. It pulls directly from the <code>kitbix_commerce_orders</code> and <code>kitbix_commerce_products</code> tables via <code>AnalyticsController::index()</code> and renders the React SPA shown below.</p>
+
+        <section>
+          <h2 class="section-title">Range selector</h2>
+          <ul>
+            <li>Presets: Last 24 Hours (<code>24h</code>), 7 Days (<code>7d</code> default), 30 Days (<code>1m</code>), 6 Months (<code>6m</code>), 12 Months (<code>1y</code>), All Time (<code>all</code>), Custom Range (<code>custom</code>).</li>
+            <li>The dropdown calls <code>/kitbix-commerce/v1/admin/analytics?range=...</code>. Custom range sends <code>start_date</code> and <code>end_date</code> ISO strings.</li>
+            <li>Ranges are timezone-aware using <code>wp_timezone()</code>; daily buckets reset at 00:00 in the site timezone.</li>
+            <li>When presets change, Redux state in <code>analyticsSlice</code> records the new filters so future sessions remember the choice.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Top-line KPIs</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Card</th>
+                  <th>Data source</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Products Added</td>
+                  <td><code>COUNT(*)</code> of <code>kitbix_commerce_products</code> created within the range.</td>
+                  <td>Useful for monitoring catalog velocity after launches.</td>
+                </tr>
+                <tr>
+                  <td>Orders Created</td>
+                  <td><code>COUNT(*)</code> of orders created in the range.</td>
+                  <td>Feeds the Orders KPI card and sparkline.</td>
+                </tr>
+                <tr>
+                  <td>Revenue</td>
+                  <td><code>SUM(total)</code> from orders.</td>
+                  <td>Subtotal, tax, and shipping are also returned for reporting.</td>
+                </tr>
+                <tr>
+                  <td>New Customers</td>
+                  <td>First order date per unique customer email.</td>
+                  <td>Only counts the earliest order per email to avoid duplicates.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Charts & widgets</h2>
+          <ol>
+            <li><strong>Sparklines:</strong> Each KPI card includes a sparkline built from the timeline buckets (<code>buildKpis()</code>).</li>
+            <li><strong>Orders chart:</strong> Bar chart showing <code>timeline.orders</code> values per bucket.</li>
+            <li><strong>Revenue trend:</strong> Line graph using <code>timeline.revenue</code>.</li>
+            <li><strong>New customers chart:</strong> Column chart using <code>timeline.new_customers</code>.</li>
+            <li><strong>Order status ring:</strong> Breakdown of pending, processing, completed, cancelled counts for the selected range.</li>
+            <li><strong>Revenue overview panel:</strong> Shows total net revenue, orders, and customers plus a textual description of the active range.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Screenshot: Analytics dashboard (Last 7 Days) showing KPI tiles, order status donut, revenue trend, orders/new customers bar charts, and revenue overview panel.</div>
+          <p class="caption">Replace with your latest capture when publishing release notes.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">REST/Redux overview</h2>
+          <ul>
+            <li><code>AnalyticsController::index()</code> handles <code>/admin/analytics</code> (GET). It validates ranges, builds SQL buckets, and returns <code>{ range, totals, series, kpis }</code>.</li>
+            <li><code>analyticsSlice.js</code> stores the payload. <code>fetchAnalytics</code> thunk wraps the REST request and handles loading states + errors.</li>
+            <li><code>useAnalyticsFeature()</code> provides helpers for preset changes and custom range submissions, bubbling toast errors if requests fail.</li>
+            <li>All data is computed server-side; no third-party tracking or external services are required.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Clear caching plugins for <code>/wp-json/kitbix-commerce/v1/admin/analytics</code> if numbers look stale—responses are personalized and should never be cached publicly.</div>
+          <div class="callout tip"><strong>Tip:</strong> Bookmark custom ranges (e.g., seasonal campaigns) by copying the query parameters from the browser bar.</div>
+          <div class="callout tip"><strong>Tip:</strong> Use the exported JSON to feed external dashboards if you need more advanced visualization.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Missing capabilities: the route requires <code>manage_options</code>. Ensure your wp-admin user has the appropriate role.</li>
+            <li>Empty charts on fresh installs: you need orders/products within the selected range to populate the data.</li>
+            <li>Using server time instead of store time: always confirm <em>Settings → General → Timezone</em> is set correctly so buckets align with real business hours.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Analytics uses direct SQL aggregations. Avoid editing Kitbix tables with unprepared statements, or you risk corrupting the data driving these reports.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

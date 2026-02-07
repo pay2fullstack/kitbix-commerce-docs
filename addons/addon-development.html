@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Addon Development · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-development">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Addon Development</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Addon Development</h1>
+        <p class="page-intro">Build first-class Kitbix addons using the registry, hooks, and REST APIs.</p>
+
+        <section>
+          <h2 class="section-title">What you will cover</h2>
+          <p>Addons are PHP classes implementing KitbixCommerceAddonsAddonContract. They register metadata, settings, and bootstrap logic.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Create a namespaced class that defines id, definition(), settings fields, and bootstrap hooks.</li>
+            <li>Register the addon via the kitbix_commerce_register_addons filter.</li>
+            <li>Use AddonRegistry::getSettings() or REST endpoints to read stored options.</li>
+            <li>Enqueue assets only when the addon is active.</li>
+            <li>Write tests or manual smoke steps so upgrades do not break your addon.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use the Digital Download addon as a reference structure (models, services, controllers).</div>
+          <div class="callout tip"><strong>Tip:</strong> Document settings and per-product fields so merchants know how to configure your addon.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Running heavy logic on every request even when the addon is disabled.</li>
+            <li>Mutating global services instead of using provided hooks and filters.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Namespace everything—class collisions with themes or plugins will break activation.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Types · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="product-overview">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Products / Product Schema</nav>
+        <div class="page-eyebrow">Products</div>
+        <h1 class="page-title">Product Schema & API</h1>
+        <p class="page-intro">Every SKU in Kitbix Commerce free lives in the <code>products</code> table and exposes a predictable set of fields consumed by the admin SPA, REST API, and storefront shortcodes.</p>
+
+        <section>
+          <h2 class="section-title">Core fields</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Description</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>Human-friendly title shown in admin and storefront cards.</td>
+                  <td><code>Product::$fillable</code> includes <code>name</code> @/wp-content/plugins/kitbix-commerce/app/Models/Product.php#9-21</td>
+                </tr>
+                <tr>
+                  <td>Slug</td>
+                  <td>Auto-generated from the name when omitted; used to build product permalinks.</td>
+                  <td><code>ProductController::prepareProductData()</code> sanitizes slugs @/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#164-199</td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td>Rich text stored as HTML (sanitized with <code>wp_kses_post</code>).</td>
+                  <td>@/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#169-173</td>
+                </tr>
+                <tr>
+                  <td>Price & Sale Price</td>
+                  <td>Decimal numbers rendered in product cards and detail pages. Sale price is optional.</td>
+                  <td>@/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#170-194</td>
+                </tr>
+                <tr>
+                  <td>Stock</td>
+                  <td>Integer count surfaced as “In stock / Out of stock” badges.</td>
+                  <td>@/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#171-195</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td>Either <code>published</code> or <code>draft</code>. Only published items appear on the storefront.</td>
+                  <td>@/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#171-196</td>
+                </tr>
+                <tr>
+                  <td>Image & Gallery</td>
+                  <td>Primary thumbnail + optional array of gallery URLs stored as JSON.</td>
+                  <td>@/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#174-198</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Categories & relationships</h2>
+          <p>Products connect to multiple categories through the <code>category_product</code> pivot. The admin SPA syncs selections whenever you save.</p>
+          <ul>
+            <li><strong>Sync logic:</strong> <code>Category::syncProductCategories()</code> rewrites pivot entries every save @/wp-content/plugins/kitbix-commerce/app/Models/Category.php#232-259.</li>
+            <li><strong>Manage categories:</strong> The modal in the SPA calls <code>CategoryController</code> endpoints for create/update/delete with nonce + capability checks @/wp-content/plugins/kitbix-commerce/app/Controllers/CategoryController.php#31-143.</li>
+            <li><strong>Front-end filters:</strong> <code>ProductController::publicIndex()</code> accepts category IDs or slugs and returns filtered results with category arrays attached @/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#63-245.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">REST endpoints to know</h2>
+          <ol>
+            <li><strong>GET /kitbix-commerce/v1/admin/products</strong> → uses <code>index()</code> with pagination, search, status, and categories.</li>
+            <li><strong>POST /kitbix-commerce/v1/admin/products</strong> → <code>store()</code> sanitizes payloads, sets timestamps, and fires <code>kitbix_commerce_product_saved</code>.</li>
+            <li><strong>PUT /kitbix-commerce/v1/admin/products/{id}</strong> → <code>update()</code> persists edits and resyncs categories.</li>
+            <li><strong>GET /kitbix-commerce/v1/products</strong> → <code>publicIndex()</code> powers the storefront grids, including search box + “All categories” filter.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Keep slugs immutable after launch so existing permalinks (and the single-product shortcode) never break.</div>
+          <div class="callout tip"><strong>Tip:</strong> Bulk edits should go through the REST endpoints above so hooks and category syncing fire consistently.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Skipping category assignments; the storefront filter drop-down only lists categories that have products attached.</li>
+            <li>Publishing with zero stock and forgetting to restock—the product grid will still display “In stock (0)” until you update.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> There are no hidden product types in the free plugin. Everything is a simple SKU with optional addon meta. Keep documentation focused on these fields.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

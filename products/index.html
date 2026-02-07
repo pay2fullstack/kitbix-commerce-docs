@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Management Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="products">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Products / Overview</nav>
+        <div class="page-eyebrow">Products</div>
+        <h1 class="page-title">Product Management Overview</h1>
+        <p class="page-intro">The Products module stores every SKU in the <code>products</code> table and exposes them through REST endpoints that both the React admin and storefront shortcodes consume.</p>
+
+        <section>
+          <h2 class="section-title">How the products screen works</h2>
+          <ul>
+            <li><strong>React admin list:</strong> The list view (see screenshot) calls <code>ProductController::index()</code> with search, status, and category filters. Actions include Edit, Delete, and opening the category manager.</li>
+            <li><strong>Storefront parity:</strong> <code>[kitbix_commerce_products]</code> reuses <code>ProductController::publicIndex()</code>, so pagination, stock badges, and category filters match what admins see.</li>
+            <li><strong>Categories modal:</strong> Clicking “Manage Categories” opens the tree powered by <code>CategoryController</code>. Any change updates the <code>category_product</code> pivot instantly.</li>
+            <li><strong>Product editor:</strong> The single edit form writes via <code>ProductController::update()</code>, handling media galleries, pricing, and category assignment in one payload.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Workflow from admin to storefront</h2>
+          <ol>
+            <li>Create or edit a product inside Kitbix Commerce → Products.</li>
+            <li>Assign categories so storefront filters populate (UI posts <code>categories</code> array, controller filters nonexistent IDs).</li>
+            <li>Save. <code>ProductController</code> persists the record and emits <code>kitbix_commerce_product_saved</code> for addons.</li>
+            <li>Reload the storefront product grid; it calls the public endpoint and reflects the new card, pricing, stock badge, and permalink.</li>
+            <li>Open the product detail page rendered by <code>public/templates/product-single.php</code> to verify gallery images and descriptions.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Screenshot: Products list inside wp-admin showing search, filters, “Add Product”, and inline edit/delete actions.</div>
+          <p class="caption">Use captures from your own environment to replace placeholders before publishing docs.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use the “Refresh Data” button in the admin list if you update products via REST; it re-queries <code>ProductController::index()</code> without a full reload.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep product slugs human-readable. Storefront permalinks are generated from the slug using <code>kitbix_commerce_product_permalink()</code>.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Deleting products that are still referenced by orders—there is no cascade cleanup.</li>
+            <li>Forgetting to re-sync categories after importing products; the pivot table stays empty unless <code>Category::syncProductCategories()</code> runs.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Product data is independent of WordPress posts. Back up the <code>products</code>, <code>categories</code>, and <code>category_product</code> tables before bulk edits.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

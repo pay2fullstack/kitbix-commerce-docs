@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Q&A · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-product-qna">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Product Q&A</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Product Q&A</h1>
+        <p class="page-intro">Collect shopper questions directly on product pages, moderate them in wp-admin, and show approved answers inline. Everything ships in the free build.</p>
+
+        <section>
+          <h2 class="section-title">Components</h2>
+          <ul>
+            <li><strong>Frontend block:</strong> Injected via <code>kitbix_commerce_after_product</code>. Layout can be accordion or card.</li>
+            <li><strong>REST API:</strong> <code>/kitbix-commerce/v1/product-qna</code> handles submissions, <code>/product-qna/moderation</code> powers the admin table.</li>
+            <li><strong>Database:</strong> Installer creates the <code>kitbix_product_qna</code> table on bootstrap.</li>
+            <li><strong>Admin UI:</strong> Adds “Product Q&A” under Kitbix Commerce with pending counts and moderation actions.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Layout Style</td>
+                  <td><code>layout_style</code></td>
+                  <td>Dropdown with “Accordion” and “Card”. Determines markup class names so your theme can target them.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Submission lifecycle</h2>
+          <ol>
+            <li>A visitor fills the question form (name + email required) rendered by <code>views/product-qna.php</code>.</li>
+            <li>JavaScript posts to the REST endpoint with a transient-backed nonce (<code>createSubmissionToken()</code>).</li>
+            <li><code>ProductQnaEntry::create()</code> stores the submission in <code>pending</code> status unless a duplicate pending entry exists for the same email/product.</li>
+            <li>Moderators answer or approve entries from Kitbix Commerce → Product Q&A, which updates status via the moderation REST routes.</li>
+            <li>Approved entries render on the product page with relative timestamps supplied by <code>formatEntries()</code>.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Testing checklist</h2>
+          <ul>
+            <li>Enable the addon in Kitbix Commerce → Addons and choose a layout.</li>
+            <li>Submit a question as a customer (check browser console for REST errors).</li>
+            <li>Approve the question in wp-admin; confirm it flips to “Published” and appears on the product page.</li>
+            <li>Switch the layout setting and reload; markup should update without cache clears.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Nonce failures when caching forms aggressively. Regenerate by reloading the product page.</li>
+            <li>No email provided → submission rejected with status 422 (handled in UI, but log this when debugging).</li>
+            <li>Expecting auto-publish. Every entry starts Pending; add SOPs so support reviews daily.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Disabling the addon keeps existing entries in the database. Re-enable later and they’ll display again.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

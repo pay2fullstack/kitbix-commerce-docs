@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Email & SMTP · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="email-smtp">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Email & SMTP</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Email & SMTP</h1>
+        <p class="page-intro">Use this tab to control checkout notifications, sender identity, and optional SMTP credentials. Values map directly to the fields sanitized in <code>SettingsController::sanitizeSettings()</code> and consumed by <code>EmailNotificationService</code>.</p>
+
+        <section>
+          <h2 class="section-title">Field reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Storage key</th>
+                  <th>Used by</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sender Name</td>
+                  <td><code>email_sender_name</code></td>
+                  <td>Header of all customer + owner emails sent through <code>EmailNotificationService</code>.</td>
+                </tr>
+                <tr>
+                  <td>Sender Email</td>
+                  <td><code>email_sender_address</code></td>
+                  <td><code>wp_mail()</code> from-address. Defaults to the WordPress admin email if left blank.</td>
+                </tr>
+                <tr>
+                  <td>Owner Notification Emails</td>
+                  <td><code>email_owner_recipients</code></td>
+                  <td>Comma-separated list that receives owner notifications when toggled on.</td>
+                </tr>
+                <tr>
+                  <td>Send order confirmation to customer</td>
+                  <td><code>email_send_customer_confirmation</code></td>
+                  <td>Determines if customers receive confirmation via <code>sendCustomerOrderConfirmation()</code>.</td>
+                </tr>
+                <tr>
+                  <td>Send new order notification to owner</td>
+                  <td><code>email_send_owner_notification</code></td>
+                  <td>Triggers <code>sendOwnerOrderNotification()</code>.</td>
+                </tr>
+                <tr>
+                  <td>Send customer email when order status changes</td>
+                  <td><code>email_send_status_updates</code></td>
+                  <td>Enables <code>sendOrderStatusUpdate()</code> when <code>OrderController::updateStatus()</code> runs.</td>
+                </tr>
+                <tr>
+                  <td>Enable SMTP</td>
+                  <td><code>smtp_enabled</code></td>
+                  <td>If enabled, the plugin configures PHPMailer with the fields below before sending.</td>
+                </tr>
+                <tr>
+                  <td>SMTP Host / Port / Encryption</td>
+                  <td><code>smtp_host</code>, <code>smtp_port</code>, <code>smtp_encryption</code></td>
+                  <td>Mapped to PHPMailer settings (<code>ssl</code>/<code>tls</code>/<code>none</code>).</td>
+                </tr>
+                <tr>
+                  <td>SMTP Username & Password</td>
+                  <td><code>smtp_username</code>, <code>smtp_password</code></td>
+                  <td>Stored as-is (password left untouched if blank on save) and fed to PHPMailer auth.</td>
+                </tr>
+                <tr>
+                  <td>SMTP From Address</td>
+                  <td><code>smtp_from_address</code></td>
+                  <td>Overrides WordPress defaults for services that require a verified sender.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Configuration workflow</h2>
+          <ol>
+            <li>Open Kitbix Commerce → Settings → Email & SMTP.</li>
+            <li>Set sender name/email and owner recipient list (comma-separated).</li>
+            <li>Toggle which notifications should send (customer confirmations, owner alerts, status updates).</li>
+            <li>If you need SMTP, flip <em>Enable SMTP</em> on and enter host, port, encryption, credentials, and optional from address.</li>
+            <li>Save and use the Orders drawer (Resend Email) to verify deliverability in staging.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use transactional providers like Mailtrap, Postmark, or SendGrid. Input their SMTP values directly; the plugin simply forwards them to PHPMailer.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep owner notification recipients to distribution lists (e.g., <code>orders@domain.com</code>) instead of personal inboxes so coverage is reliable.</div>
+          <div class="callout tip"><strong>Tip:</strong> Always test on staging first. SMTP errors are logged to <code>error_log</code> if PHPMailer throws.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Leaving SMTP enabled without entering host/credentials—messages will fail silently.</li>
+            <li>Using Gmail/Outlook addresses without configuring App Passwords or allowing SMTP relays.</li>
+            <li>Disabling customer confirmations and forgetting to notify support, resulting in increased ticket volume.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> When cloning databases, scrub SMTP passwords or swap them for sandbox credentials immediately to avoid emailing real customers from staging.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

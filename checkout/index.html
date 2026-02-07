@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="checkout">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Checkout / Overview</nav>
+        <div class="page-eyebrow">Checkout</div>
+        <h1 class="page-title">Checkout Overview</h1>
+        <p class="page-intro">Control cart behavior, form fields, payment gateways, and post-order workflows.</p>
+
+        <section>
+          <h2 class="section-title">What you will cover</h2>
+          <p>Kitbix keeps checkout lean: vanilla JS cart interactions backed by REST endpoints for totals and payments.</p>
+          <p>This section highlights the touchpoints shoppers experience before placing an order.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Review the cart and checkout shortcodes inside your theme for layout alignment.</li>
+            <li>Configure payment gateways under Settings → Payments.</li>
+            <li>Enable or disable checkout fields to match your fulfillment process.</li>
+            <li>Test coupons, taxes, and shipping quotes on staging before launch.</li>
+            <li>Place at least one real test order per gateway to confirm hooks and emails fire correctly.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Display trust badges or cutoff timers via addons to reduce friction.</div>
+          <div class="callout tip"><strong>Tip:</strong> Use browser dev tools to inspect REST responses when debugging checkout.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Leaving sandbox keys in production gateways.</li>
+            <li>Hiding required address fields, causing carriers to reject shipments.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Clear localStorage/cart caches between test runs to avoid stale data.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

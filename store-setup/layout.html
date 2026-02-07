@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Layout Settings · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="layout">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Layout</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Layout Settings</h1>
+        <p class="page-intro">Choose which storefront templates render products, cart, checkout, and pagination. These values live in <code>kitbix_commerce_settings</code> and are read by every shortcode template inside <code>public/templates</code>.</p>
+
+        <section>
+          <h2 class="section-title">Field map</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Control</th>
+                  <th>Options</th>
+                  <th>Where it applies</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Product Grid Layout</td>
+                  <td>Grid Showcase / Masonry / Spotlight</td>
+                  <td><code>product-grid.php</code> passes the layout to <code>kitbix_commerce_render_product_card()</code>, changing card classes and hover states.</td>
+                </tr>
+                <tr>
+                  <td>Product Detail Template</td>
+                  <td>Classic Details / Gallery / Story</td>
+                  <td><code>product-single.php</code> loads different partial blocks and summary positions. Story mode auto-generates highlighted copy.</td>
+                </tr>
+                <tr>
+                  <td>Cart Template</td>
+                  <td>Standard Summary / Compact / Minimal</td>
+                  <td><code>cart.php</code> switches wrapper classes (<code>kitbix-commerce-cart--*</code>) so you can style condensed tables or full width carts.</td>
+                </tr>
+                <tr>
+                  <td>Checkout Template</td>
+                  <td>Classic Steps / Modern / Split</td>
+                  <td><code>checkout.php</code> adds <code>kitbix-commerce-checkout--{template}</code>; the React checkout mounts within that shell.</td>
+                </tr>
+                <tr>
+                  <td>Product Pagination</td>
+                  <td>Infinite Scroll / Load More / Paged</td>
+                  <td>Controls <code>data-pagination-type</code> on the grid, which the frontend script uses to inject infinite scroll observers or numbered pagination.</td>
+                </tr>
+                <tr>
+                  <td>Products per Page</td>
+                  <td>1–50 items (default 12)</td>
+                  <td>Passed to <code>Product::publicPaginate()</code> and embedded in <code>data-page-size</code> for client-side fetching.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Open Kitbix Commerce → Settings → Layout.</li>
+            <li>Choose a product grid + detail template that matches your theme’s columns.</li>
+            <li>Select cart and checkout templates; preview the <code>[kitbix_commerce_cart]</code> and <code>[kitbix_commerce_checkout]</code> pages.</li>
+            <li>Pick a pagination style and set Products per Page (the SPA enforces 1–50).</li>
+            <li>Save, then reload storefront pages to verify new classes/styles took effect.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Override template files in your theme only after locking the layout choice; the selected option determines which classes your CSS should target.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep pagination consistent across environments to avoid unexpected behavior in cached JS bundles.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Choosing pagination types that your theme overrides with conflicting JS (e.g., enabling infinite scroll while a theme forces numbered pagination).</li>
+            <li>Editing template files without mirroring the same layout option on staging—merchants will see different UI from what you tested.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> After changing templates, purge caches/CDNs and retest every shortcode page; stale HTML can mix old/new class names and break styling.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

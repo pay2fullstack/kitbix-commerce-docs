@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Developer Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="developers">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Developers / Overview</nav>
+        <div class="page-eyebrow">Developers</div>
+        <h1 class="page-title">Developer Overview</h1>
+        <p class="page-intro">This guide orients you around the free Kitbix Commerce plugin internals—how it boots, where routes live, and how to extend it safely.</p>
+
+        <section>
+          <h2 class="section-title">Architecture snapshot</h2>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>Boot process</h3>
+              <ul>
+                <li><code>KitbixCommerce\Core\Plugin::boot()</code> wires up REST routes, assets, addon registry, payment gateways, and hooks into <code>init</code>, <code>admin_menu</code>, <code>wp_enqueue_scripts</code>, etc.</li>
+                <li>Activation (<code>Plugin::activate()</code>) runs database migrations (<code>Core\Database::migrate()</code>) and ensures required pages exist.</li>
+                <li>Addon bootstrap happens on <code>init</code> (priority 20) via <code>AddonRegistry::boot()</code>; each addon registers metadata + hooks.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Key directories</h3>
+              <ul>
+                <li><code>app/Controllers</code>: REST endpoints (Products, Orders, Analytics, Settings, etc.).</li>
+                <li><code>app/Models</code>: Thin wrappers around Kitbix tables using a shared <code>Model</code> base class.</li>
+                <li><code>app/Addons</code>: Free addons (toast, view counter, trust badge…), each with contract + assets.</li>
+                <li><code>database/migrations</code>: dbDelta callbacks executed on activation.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Developer workflow</h2>
+          <ol>
+            <li>Confirm requirements: decide whether a hook, addon, REST route, or shortcode override best solves the problem.</li>
+            <li>Inspect the relevant controller/model. All REST logic runs through <code>/wp-json/kitbix-commerce/v1</code> (admin + public route files describe every endpoint).</li>
+            <li>Extend using hooks (<code>kitbix_commerce_order_created</code>, <code>kitbix_commerce_product_saved</code>, etc.) or register new addons through <code>kitbix_commerce_register_addons</code>.</li>
+            <li>Add tests/logging. Most controllers sanitize via <code>sanitize_text_field</code>/<code>current_time</code>, so mirror that style when posting data.</li>
+            <li>Ship via MU plugin or standalone plugin so updates to Kitbix core remain drop-in.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Core services</h2>
+          <ul>
+            <li><strong>Database layer:</strong> <code>Core\Database</code> prefixes tables and exposes <code>migrate()</code>. Models call <code>static::wpdb()</code> to run queries.</li>
+            <li><strong>Cart/checkout:</strong> <code>Services\CartService</code> and <code>CheckoutTotals</code> calculate totals, handle gateway charges, and update stock.</li>
+            <li><strong>Email notifications:</strong> <code>EmailNotificationService</code> sends confirmations/status emails keyed off controller actions.</li>
+            <li><strong>Router:</strong> REST routes are declared in <code>routes/admin.php</code> and <code>routes/public.php</code> then registered automatically.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Load WordPress stubs (or <code>phpstan/wordpress</code>) in your IDE to satisfy functions such as <code>sanitize_text_field()</code> and <code>current_time()</code>.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep addon logic idempotent—addons can be toggled on/off without flushing state, so guard expensive operations behind <code>AddonRegistry::isEnabled()</code>.</div>
+          <div class="callout tip"><strong>Tip:</strong> Namespaces follow PSR-4. Autoload new code via Composer or <code>spl_autoload_register</code> before hooking into Kitbix.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Editing plugin templates directly instead of using hooks (e.g., <code>kitbix_commerce_checkout_after_payment_methods</code>).</li>
+            <li>Skipping nonce verification when calling admin endpoints (<code>Controller::verifyNonce()</code> blocks those requests).</li>
+            <li>Writing raw SQL without <code>$wpdb->prepare()</code> or respecting the Kitbix table prefix helper.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Never fork the plugin to add logic—upgrades will overwrite your changes. Build extensions as separate plugins or addons so the free core can be updated safely.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

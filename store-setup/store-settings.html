@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Store Settings · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="store-settings">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Store Settings</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Store Settings</h1>
+        <p class="page-intro">The Store tab controls global currency, checkout math, and which gateways Kitbix exposes on the frontend. All values are persisted by <code>SettingsController::sanitizeSettings()</code> so shortcodes can read them in real time.</p>
+
+        <section>
+          <h2 class="section-title">Field reference (Store tab)</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Storage key</th>
+                  <th>Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Currency</td>
+                  <td><code>currency</code></td>
+                  <td>Used by <code>kitbix_commerce_get_currency()</code>, CartService, CheckoutTotals, and every shortcode template. Gateway list is filtered by supporters of this currency.</td>
+                </tr>
+                <tr>
+                  <td>Enabled Payment Methods</td>
+                  <td><code>payment_methods[]</code></td>
+                  <td>Stores gateway IDs (stripe, paypal, cod). The SPA only shows toggled gateways, and CartService::availableGateways() hides anything missing here.</td>
+                </tr>
+                <tr>
+                  <td>Checkout Tax Rate (%)</td>
+                  <td><code>checkout_tax_rate</code></td>
+                  <td>Converted to a decimal and injected into <code>data-tax-rate</code> on <code>checkout.php</code> so the JS totals widget can calculate taxes.</td>
+                </tr>
+                <tr>
+                  <td>Flat Shipping Amount</td>
+                  <td><code>checkout_shipping_flat</code></td>
+                  <td>Passed to CheckoutTotals and surfaced in <code>data-shipping-flat</code> for client-side display.</td>
+                </tr>
+                <tr>
+                  <td>Products per Page</td>
+                  <td><code>product_page_size</code></td>
+                  <td>Controls <code>Product::publicPaginate()</code> page size and the <code>data-page-size</code> attribute on the grid.</td>
+                </tr>
+                <tr>
+                  <td>Product Pagination Type</td>
+                  <td><code>product_pagination_type</code></td>
+                  <td>Switches between infinite scroll, load more, or paged grids; validated to one of those three values.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">How values flow through Kitbix</h2>
+          <ul>
+            <li><strong>Shortcodes:</strong> <code>Plugin::renderProductsShortcode()</code>, <code>renderCartShortcode()</code>, and <code>renderCheckoutShortcode()</code> call <code>kitbix_commerce_get_settings()</code> before loading templates.</li>
+            <li><strong>Checkout:</strong> <code>checkout.php</code> embeds tax and shipping defaults as data attributes so the React checkout component can calculate totals.</li>
+            <li><strong>Validation:</strong> <code>SettingsController::update()</code> blocks negative tax/shipping values and ensures every enabled gateway supports the selected currency.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Recommended workflow</h2>
+          <ol>
+            <li>Pick the store currency first, then toggle gateways that accept it.</li>
+            <li>Enter realistic tax % and shipping flat-rate based on your fulfillment promise. Use decimals (15 for 15%).</li>
+            <li>Set product pagination + page size to match your theme’s layout (e.g., 12 cards in a grid).</li>
+            <li>Save changes and reload storefront shortcodes to confirm the new math.</li>
+            <li>Trigger a sandbox checkout to verify CartService emits only the enabled gateways.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Document currency decisions in your ops runbook. Changing it later requires re-entering every product price.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep tax and shipping inputs positive whole numbers to match the SPA validation and prevent REST errors.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Mixing unsupported gateways with the active currency (SettingsController will throw a 422 response).</li>
+            <li>Setting negative tax or shipping values; the REST call fails and nothing is saved.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> If you migrate environments, always clear any caching/plugin that might serve stale <code>kitbix_commerce_settings</code> or the storefront will show outdated currency and totals.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Categories · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="categories">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Products / Categories</nav>
+        <div class="page-eyebrow">Products</div>
+        <h1 class="page-title">Product Categories</h1>
+        <p class="page-intro">Categories drive storefront filters and breadcrumbs. They are stored in the <code>categories</code> table and synced to products through the <code>category_product</code> pivot.</p>
+
+        <section>
+          <h2 class="section-title">Category manager anatomy</h2>
+          <ul>
+            <li><strong>Tree panel:</strong> Left-hand column lists every category (name + slug). Clicking an item loads it into the edit form.</li>
+            <li><strong>Form fields:</strong> Name, slug, parent selector, description, image URL, and display order map directly to <code>Category::$fillable</code>.</li>
+            <li><strong>+ New button:</strong> Resets the form for creating a new record.</li>
+            <li><strong>Modal behavior:</strong> Triggered from the Products list or product editor sidebar. All actions call REST endpoints in <code>CategoryController</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Create or edit a category</h2>
+          <ol>
+            <li>Open the Products screen and click “Manage Categories”.</li>
+            <li>Enter a Name. If Slug is left blank, <code>sanitize_title()</code> generates one automatically.</li>
+            <li>(Optional) Choose a parent to build nested navigation. The controller validates against circular references @/wp-content/plugins/kitbix-commerce/app/Controllers/CategoryController.php#70-191.</li>
+            <li>Set Display Order to control list ordering on the storefront filter.</li>
+            <li>Save. The modal calls <code>CategoryController::store()</code> or <code>update()</code>, which timestamps and persists the record.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Assign categories to products</h2>
+          <p>The product editor sidebar lists existing categories. Selected IDs are posted back to the API, which filters invalid entries and resyncs the pivot table.</p>
+          <ul>
+            <li><strong>Extraction:</strong> <code>ProductController::extractCategoryIds()</code> accepts arrays, comma strings, or objects and converts them into valid IDs @/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#201-230.</li>
+            <li><strong>Sync:</strong> <code>Category::syncProductCategories()</code> wipes old rows then inserts the new mapping for the product @/wp-content/plugins/kitbix-commerce/app/Models/Category.php#232-259.</li>
+            <li><strong>Front-end:</strong> <code>ProductController::appendCategoriesToProducts()</code> attaches category arrays to every API response so the React admin and storefront can display badges and filters @/wp-content/plugins/kitbix-commerce/app/Controllers/ProductController.php#232-249.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Creating duplicate slugs: <code>CategoryController</code> blocks this with a 422 response, so the UI keeps spinning if you reuse a slug.</li>
+            <li>Assigning a category as its own parent or selecting descendants—validation prevents it, but it wastes time.</li>
+            <li>Deleting categories without reassigning products; the pivot cleanup removes links, so products fall out of storefront filters.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Always export categories before bulk edits. They aren’t stored in WordPress taxonomies, so default export plugins will miss them.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

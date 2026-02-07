@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Related Products · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-related-products">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Related Products</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Related Products</h1>
+        <p class="page-intro">Keeps shoppers browsing by showing products from the same categories at the bottom of each product detail page.</p>
+
+        <section>
+          <h2 class="section-title">Data flow</h2>
+          <ol>
+            <li><code>RelatedProductsAddon</code> hooks into <code>kitbix_commerce_after_product</code> (priority 30) and only runs on product contexts.</li>
+            <li>It pulls the current product’s category IDs, queries <code>Product::publicPaginate()</code> for additional items, and filters out the current product.</li>
+            <li>The view (<code>views/related-products.php</code>) outputs cards with image, name, formatted price, and CTA linking to <code>kitbix_commerce_product_permalink()</code>.</li>
+            <li>Currency formatting relies on <code>kitbix_commerce_get_currency()</code> and helper functions, so storefront and addon stay in sync.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Section Title</td>
+                  <td><code>section_title</code></td>
+                  <td>Main heading for the block. Defaults to “Related Products”.</td>
+                </tr>
+                <tr>
+                  <td>Eyebrow Text</td>
+                  <td><code>eyebrow_text</code></td>
+                  <td>Optional label above the title (e.g., “You may also like”). Leave blank to hide.</td>
+                </tr>
+                <tr>
+                  <td>Maximum Items</td>
+                  <td><code>max_items</code></td>
+                  <td>Number of cards to render (2–8). The addon fetches extra products and truncates after this value.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Implementation tips</h2>
+          <ul>
+            <li>Ensure every product belongs to at least one category; otherwise no related results will appear.</li>
+            <li>Use consistent square imagery; the template simply prints the first gallery image (or featured image) without cropping.</li>
+            <li>If you want to exclude out-of-stock items, customize <code>Product::publicPaginate()</code> via a child plugin.</li>
+            <li>CSS lives in <code>assets/related-products.css</code>; extend it in your theme for grid tweaks.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Testing checklist</h2>
+          <ul>
+            <li>Enable the addon and set title/eyebrow text to match your voice.</li>
+            <li>Visit a product with multiple category siblings—verify the block renders and max items respected.</li>
+            <li>Test a product in a unique category; the block should stay hidden if no related items exist.</li>
+            <li>Check mobile breakpoints for wrapping issues; adjust theme CSS if necessary.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Using max items above 8 causes the validation to clamp to 8, so document expectations with stakeholders.</li>
+            <li>Deleting categories without reassigning products leaves orphaned products and empty related blocks.</li>
+            <li>Expecting manual curation—this addon is category-driven; use featured products if you need hand-picked upsells.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Disabling the addon only hides the UI. Settings remain stored, so you can toggle it back on without reconfiguration.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

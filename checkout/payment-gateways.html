@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payment Gateways · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="payment-gateways">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Checkout / Payment Gateways</nav>
+        <div class="page-eyebrow">Checkout</div>
+        <h1 class="page-title">Payment Gateways</h1>
+        <p class="page-intro">Configure bundled gateways or register custom ones with hooks.</p>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Go to Kitbix Commerce → Settings → Payments.</li>
+            <li>Enable the desired gateway and fill in API credentials.</li>
+            <li>Confirm supported currencies align with your store currency.</li>
+            <li>Configure webhook URLs so asynchronous events sync correctly.</li>
+            <li>Place at least one order per gateway in sandbox mode before switching to live keys.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Bundled gateways</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Gateway</th>
+                  <th>Mode</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stripe</td>
+                  <td>Card (Elements)</td>
+                  <td>Supports SCA, saved payment intents, and webhooks.</td>
+                </tr>
+                <tr>
+                  <td>PayPal</td>
+                  <td>Redirect</td>
+                  <td>Creates PayPal orders then returns to /checkout?paypal=return.</td>
+                </tr>
+                <tr>
+                  <td>Cash on Delivery</td>
+                  <td>Offline</td>
+                  <td>Creates pending orders without instant payment.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use the kitbix_commerce_payment_gateways filter to register custom providers.</div>
+          <div class="callout tip"><strong>Tip:</strong> Store live credentials in wp-config constants rather than the database when possible.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Mixing sandbox and live keys, resulting in declined charges.</li>
+            <li>Ignoring webhook verification—status updates never arrive.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Never log raw webhook payloads in production; scrub PII before persistence.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

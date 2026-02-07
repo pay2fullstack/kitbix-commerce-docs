@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brand Colors · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="brand-colors">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Brand Colors</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Brand Colors</h1>
+        <p class="page-intro">Control the six color tokens Kitbix Commerce exposes as CSS custom properties. These values flow through <code>kitbix_commerce_brand_style_attr()</code>, so every shortcode adopts them without manual CSS edits.</p>
+
+        <section>
+          <h2 class="section-title">Token reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Storage key</th>
+                  <th>CSS variable</th>
+                  <th>Used in</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Primary Color</td>
+                  <td><code>brand_primary</code></td>
+                  <td><code>--kitbix-commerce-primary</code></td>
+                  <td>Buttons, CTA backgrounds, active states.</td>
+                </tr>
+                <tr>
+                  <td>Accent Color</td>
+                  <td><code>brand_accent</code></td>
+                  <td><code>--kitbix-commerce-accent</code></td>
+                  <td>Links, category filters, subtle highlights.</td>
+                </tr>
+                <tr>
+                  <td>Success Color</td>
+                  <td><code>brand_success</code></td>
+                  <td><code>--kitbix-commerce-success</code></td>
+                  <td>Status badges (in stock, confirmations).</td>
+                </tr>
+                <tr>
+                  <td>Danger Color</td>
+                  <td><code>brand_danger</code></td>
+                  <td><code>--kitbix-commerce-danger</code></td>
+                  <td>Error alerts, validation messages.</td>
+                </tr>
+                <tr>
+                  <td>Muted Text Color</td>
+                  <td><code>brand_muted</code></td>
+                  <td><code>--kitbix-commerce-muted</code></td>
+                  <td>Helper copy, empty states, cart hint text.</td>
+                </tr>
+                <tr>
+                  <td>Border Color</td>
+                  <td><code>brand_border</code></td>
+                  <td><code>--kitbix-commerce-border</code></td>
+                  <td>Card outlines, table dividers, form inputs.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Open Kitbix Commerce → Settings → Brand Colors.</li>
+            <li>Enter hex codes (with <code>#</code>) for each token; the SPA validates via <code>sanitize_hex_color()</code>.</li>
+            <li>Save to persist values inside <code>kitbix_commerce_settings</code>.</li>
+            <li>Reload storefront pages; shortcodes inject <code>style="--kitbix-commerce-*: ..."</code> automatically.</li>
+            <li>Override or extend styles in your theme using the same CSS variables.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Match these tokens to your WordPress theme palette so embedded shortcodes blend seamlessly.</div>
+          <div class="callout tip"><strong>Tip:</strong> Use the muted/border tokens to maintain consistent contrast ratios in custom CSS.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Forgetting the leading <code>#</code> in hex values—those entries fail sanitization.</li>
+            <li>Hardcoding colors directly in theme overrides instead of referencing the provided CSS variables.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> When cloning environments, copy <code>kitbix_commerce_settings</code> or the brand palette will fall back to defaults (#1d4ed8, #4338ca, etc.).</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

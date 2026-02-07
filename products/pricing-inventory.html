@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pricing & Inventory · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="pricing-inventory">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Products / Pricing & Inventory</nav>
+        <div class="page-eyebrow">Products</div>
+        <h1 class="page-title">Pricing & Inventory</h1>
+        <p class="page-intro">Prices, sale prices, and stock counts live on each product row. There are no separate price books or warehouses in the free plugin, so keep these fields accurate.</p>
+
+        <section>
+          <h2 class="section-title">Field behavior</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Stored as</th>
+                  <th>Front-end usage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Price</td>
+                  <td><code>products.price</code> (float)</td>
+                  <td>Primary number rendered on cards, detail page, cart, and checkout.</td>
+                </tr>
+                <tr>
+                  <td>Sale Price</td>
+                  <td><code>products.sale_price</code> (float or null)</td>
+                  <td>If set and lower than price, templates show the strikethrough compare price.</td>
+                </tr>
+                <tr>
+                  <td>Stock</td>
+                  <td><code>products.stock</code> (integer)</td>
+                  <td>Displayed as “IN STOCK (x AVAILABLE)” on cards and detail page. Cart/checkout prevent adding more than the stock value.</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td><code>products.status</code></td>
+                  <td>Draft products never appear on storefront, regardless of stock.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Update workflow</h2>
+          <ol>
+            <li>Open any product from Kitbix Commerce → Products.</li>
+            <li>Adjust Price and (optionally) Sale Price. The UI stores raw numbers; currency symbols are applied at render time via <code>kitbix_commerce_format_currency()</code>.</li>
+            <li>Set Stock to the on-hand quantity. There are no separate “track inventory” toggles.</li>
+            <li>Click Update Product. <code>ProductController::update()</code> saves the numbers and updates the <code>updated_at</code> timestamp.</li>
+            <li>Reload the storefront grid to confirm price/sale badges and stock counts refresh instantly.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Automation</h2>
+          <ul>
+            <li><strong>REST API:</strong> PATCH <code>/kitbix-commerce/v1/admin/products/{id}</code> with <code>{"price": 69, "stock": 48}</code> to sync from ERPs.</li>
+            <li><strong>Hooks:</strong> Subscribe to <code>kitbix_commerce_product_saved</code> to trigger webhooks after price changes.</li>
+            <li><strong>Storefront math:</strong> Cart and checkout totals always recalc using the saved product price, not cached values.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Setting sale price higher than price—the UI allows it, but storefront cards will still show the lower number as “Sale”.</li>
+            <li>Leaving stock at “0” after restocks, which makes every product show “In stock (0 available)”.</li>
+            <li>Editing the database directly; you’ll skip sanitization and the <code>kitbix_commerce_product_saved</code> hook.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Always update prices/stock via the admin SPA or REST endpoints so Category syncing, meta hooks, and timestamps remain accurate.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

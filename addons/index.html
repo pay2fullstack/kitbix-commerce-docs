@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Addon Management Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addons">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Overview</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Addon Management Overview</h1>
+        <p class="page-intro">The free Kitbix Commerce build ships with seven addons: Live Purchase Toast, Live View Counter, Payment Trust Badge, Product Q&A, Related Products, Shipping Cutoff Clock, and WhatsApp Contact Button. All of them are toggled from Kitbix Commerce → Addons as shown in the screenshot.</p>
+
+        <section>
+          <h2 class="section-title">Addon manager anatomy</h2>
+          <ul>
+            <li><strong>Categories:</strong> Pills across the top filter addons by Product, Checkout, Marketing, Integration, and UX.</li>
+            <li><strong>Cards:</strong> Each addon card shows a toggle, short description, and inline settings (e.g., message templates, limits, CTA colors).</li>
+            <li><strong>Live preview cues:</strong> Some cards include sample text “Order ships now” or “Live view counter” so you know how the UI should look.</li>
+            <li><strong>Saved state:</strong> Settings persist immediately through <code>AddonRegistry::updateSettings()</code>; no separate “Save” button exists on the listing screen.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Included addons</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Addon</th>
+                  <th>Category</th>
+                  <th>Primary hook</th>
+                  <th>Key setting</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="./live-purchase-toast.html">Live Purchase Toast</a></td>
+                  <td>Marketing</td>
+                  <td><code>wp_footer</code> renders the toast container on product/shop pages.</td>
+                  <td>Message template (uses <code>{location}</code> placeholder).</td>
+                </tr>
+                <tr>
+                  <td><a href="./live-view-counter.html">Live View Counter</a></td>
+                  <td>Marketing</td>
+                  <td><code>kitbix_commerce_after_product_details</code></td>
+                  <td>Message template with <code>{count}</code> placeholder.</td>
+                </tr>
+                <tr>
+                  <td><a href="./payment-trust-badge.html">Payment Trust Badge</a></td>
+                  <td>Checkout</td>
+                  <td><code>kitbix_commerce_checkout_after_payment_methods</code></td>
+                  <td>Badge title + logo image URL.</td>
+                </tr>
+                <tr>
+                  <td><a href="./product-qna.html">Product Q&A</a></td>
+                  <td>Product</td>
+                  <td><code>kitbix_commerce_after_product</code></td>
+                  <td>Layout style (accordion or card).</td>
+                </tr>
+                <tr>
+                  <td><a href="./related-products.html">Related Products</a></td>
+                  <td>Product</td>
+                  <td><code>kitbix_commerce_after_product</code></td>
+                  <td>Section title, eyebrow, and max items (2–8).</td>
+                </tr>
+                <tr>
+                  <td><a href="./shipping-cutoff-clock.html">Shipping Cutoff Clock</a></td>
+                  <td>UX</td>
+                  <td>Product, cart, and checkout hooks.</td>
+                  <td>Daily cutoff time + before/after messages.</td>
+                </tr>
+                <tr>
+                  <td><a href="./whatsapp-contact.html">WhatsApp Contact Button</a></td>
+                  <td>Integration</td>
+                  <td><code>wp_footer</code> loads floating CTA button.</td>
+                  <td>Phone number + greeting template.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Screenshot: Kitbix Addons list showing marketing, checkout, product, and integration cards with inline toggles.</div>
+          <p class="caption">Capture a fresh shot any time you introduce or remove addons.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Setup workflow</h2>
+          <ol>
+            <li>Go to Kitbix Commerce → Addons and toggle on an addon.</li>
+            <li>Fill the inline settings (message template, cutoff times, etc.).</li>
+            <li>Open the addon’s detail doc from the list above to configure any per-product hooks.</li>
+            <li>Load the storefront page that uses the addon (product page, cart, checkout) and verify the UI matches expectations.</li>
+            <li>Log the enabled addons in your go-live checklist so future releases can compare.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Keep message templates short and localized; every addon string passes through <code>AddonRegistry::getSettings()</code> so translations can hook in.</div>
+          <div class="callout tip"><strong>Tip:</strong> Test addons on staging with dummy orders (for toast/Q&A) before enabling them in production.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Leaving WhatsApp or toast add-ons enabled without providing a phone number/message template—nothing renders until required fields are filled.</li>
+            <li>Expecting Product Q&A to populate automatically. Your team must approve entries via Kitbix Commerce → Product Q&A.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Disabling an addon hides its UI but keeps saved settings. You can safely toggle off an addon temporarily without losing configuration.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

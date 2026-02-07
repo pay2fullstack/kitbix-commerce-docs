@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Server Requirements · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="requirements">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Getting Started / Requirements</nav>
+        <div class="page-eyebrow">Getting Started</div>
+        <h1 class="page-title">Server Requirements</h1>
+        <p class="page-intro">Verify hosting prerequisites before onboarding merchants or importing catalogs.</p>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Run wp cli --info (or php -v) to confirm versions.</li>
+            <li>Ensure wp-content/uploads and wp-content/plugins are writable by the web user.</li>
+            <li>Verify cron events execute or configure a real cron hitting wp-cron.php.</li>
+            <li>Hit /wp-json/kitbix-commerce/v1/ping over HTTPS to test permalinks and SSL.</li>
+            <li>Allocate at least 256 MB RAM to PHP-FPM when importing large catalogs.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Supported stack</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Minimum</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>WordPress</td>
+                  <td>6.3+</td>
+                  <td>Uses modern REST routing and script modules.</td>
+                </tr>
+                <tr>
+                  <td>PHP</td>
+                  <td>8.1+</td>
+                  <td>Typed properties and Fibers power queue workers.</td>
+                </tr>
+                <tr>
+                  <td>Database</td>
+                  <td>MySQL 5.7 / MariaDB 10.4+</td>
+                  <td>JSON columns + utf8mb4 indexes for product metadata.</td>
+                </tr>
+                <tr>
+                  <td>Extensions</td>
+                  <td>curl, gd, intl, mbstring, zip</td>
+                  <td>Needed for payments, image resizing, and download bundling.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Enable OPcache and persistent object cache for faster admin tables.</div>
+          <div class="callout tip"><strong>Tip:</strong> Mirror PHP versions between CLI and web to avoid serialized payload mismatches.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Ignoring DISABLE_WP_CRON=true—order emails never send.</li>
+            <li>Running on outdated MariaDB builds that truncate utf8mb4 titles.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Do not install Kitbix on read-only hosting—addons create additional tables during bootstrap.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

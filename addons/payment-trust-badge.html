@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payment Trust Badge · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-payment-trust-badge">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Payment Trust Badge</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Payment Trust Badge</h1>
+        <p class="page-intro">Displays a reassurance block directly beneath the checkout payment methods showing your accepted providers.</p>
+
+        <section>
+          <h2 class="section-title">Hook flow</h2>
+          <ul>
+            <li><code>PaymentTrustBadgeAddon</code> registers on <code>wp_enqueue_scripts</code> and <code>kitbix_commerce_checkout_after_payment_methods</code>.</li>
+            <li>Assets live in <code>app/Addons/payment_trust_badge/assets/</code>; only the CSS file is loaded to keep markup lightweight.</li>
+            <li>The badge view (<code>views/payment-trust-badge.php</code>) renders a heading plus a single <code>&lt;img&gt;</code> that you configure.</li>
+            <li>Rendering stops if the addon is disabled or no <code>logo_url</code> is configured.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Badge Title</td>
+                  <td><code>title</code></td>
+                  <td>Optional heading displayed above the logos. Defaults to “Secure checkout powered by trusted providers”.</td>
+                </tr>
+                <tr>
+                  <td>Logo Image URL</td>
+                  <td><code>logo_url</code></td>
+                  <td>Absolute URL to a horizontal sprite of payment logos. Fallbacks to the bundled SVG if left blank.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Deployment checklist</h2>
+          <ol>
+            <li>Enable the addon from Kitbix Commerce → Addons.</li>
+            <li>Paste your logo sprite URL (ideally an SVG or 2x PNG). Make sure the image background matches the checkout section.</li>
+            <li>Visit your checkout page (<code>[kitbix_commerce_checkout]</code>) and confirm the badge appears under the payment selector.</li>
+            <li>Resize the browser to ensure the image scales; the CSS constrains max-width while preserving aspect ratio.</li>
+          </ol>
+          <div class="callout tip"><strong>Tip:</strong> Store the sprite in your theme or CDN and version the URL so browsers pick up changes immediately.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Troubleshooting</h2>
+          <ul>
+            <li>No badge? Check <code>AddonRegistry::isEnabled('payment_trust_badge')</code> and verify the checkout page isn’t cached without the localized option.</li>
+            <li>Broken logo path returns nothing because <code>esc_url_raw()</code> sanitizes invalid URLs.</li>
+            <li>Multiple badges? Ensure you do not manually include similar HTML in your checkout template.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> This addon only runs on checkout pages detected via <code>kitbix_commerce_get_page_id('checkout')</code> or the checkout shortcode. It will not render on custom thank-you pages.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

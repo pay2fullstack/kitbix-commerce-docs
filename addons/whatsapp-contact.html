@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WhatsApp Contact Button · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-whatsapp-contact">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / WhatsApp Contact Button</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">WhatsApp Contact Button</h1>
+        <p class="page-intro">Adds a floating WhatsApp launcher so shoppers can message your sales or support team without leaving the storefront.</p>
+
+        <section>
+          <h2 class="section-title">Behavior overview</h2>
+          <ul>
+            <li><code>WhatsappIntegrationAddon</code> enqueues CSS/JS on <code>wp_enqueue_scripts</code> and prints the floating button in <code>wp_footer</code>.</li>
+            <li>Assets live under <code>app/Addons/whatsapp_integration/assets/</code> (SVG icon, styles, lightweight script).</li>
+            <li>Addon aborts if no phone number is configured or if it’s running in wp-admin.</li>
+            <li>Context detection (product/cart/checkout/other) controls whether the button appears, based on the <code>display_context</code> setting.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>WhatsApp Number</td>
+                  <td><code>phone_number</code></td>
+                  <td>Digits only (country code + number). Required or nothing renders.</td>
+                </tr>
+                <tr>
+                  <td>Greeting Template</td>
+                  <td><code>message_template</code></td>
+                  <td>Default: “Hi! I'm interested in {product}…”. Supports placeholders <code>{product}</code>, <code>{price}</code>, <code>{url}</code>, <code>{site}</code>.</td>
+                </tr>
+                <tr>
+                  <td>Display Context</td>
+                  <td><code>display_context</code></td>
+                  <td>Options: storefront (default), product_only, cart_checkout, all.</td>
+                </tr>
+                <tr>
+                  <td>Button Position</td>
+                  <td><code>button_position</code></td>
+                  <td>Bottom right (default) or bottom left.</td>
+                </tr>
+                <tr>
+                  <td>Accent Color</td>
+                  <td><code>accent_color</code></td>
+                  <td>HEX color validated via <code>sanitize_hex_color()</code>. Defaults to WhatsApp green (#25d366).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Implementation checklist</h2>
+          <ol>
+            <li>Enable the addon in Kitbix Commerce → Addons.</li>
+            <li>Enter your phone number using digits only (no + signs or spaces).</li>
+            <li>Customize the greeting template with localized copy; keep placeholders intact for dynamic substitution.</li>
+            <li>Pick where the button should appear (position + display context).</li>
+            <li>Open a storefront page and click the button to ensure it launches the correct <code>https://wa.me/</code> link with prefilled message.</li>
+          </ol>
+          <div class="callout tip"><strong>Tip:</strong> If your support hours vary, update the template to mention response windows.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Troubleshooting</h2>
+          <ul>
+            <li>No button? Confirm the addon is enabled and that the phone number passes the regex (digits only).</li>
+            <li>Context mismatch? Review <code>display_context</code>; the addon short-circuits on pages without Kitbix shortcodes unless you choose “all”.</li>
+            <li>Color not changing? Ensure you’re supplying a valid HEX value (#RRGGBB). Invalid values fall back to the default green.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> The floating button is injected via <code>wp_footer</code>. Themes that omit <code>wp_footer()</code> will never render the addon—fix the theme first.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

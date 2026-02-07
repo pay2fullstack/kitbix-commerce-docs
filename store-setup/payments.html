@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payments · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="payments">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Payments</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Payments</h1>
+        <p class="page-intro">The Payments tab configures Stripe, PayPal, and Cash on Delivery inside Kitbix Commerce. All inputs are sanitized by <code>SettingsController::sanitizePaymentSettings()</code>, then stored via <code>PaymentManager::updateSettings()</code>.</p>
+
+        <section>
+          <h2 class="section-title">Gateway overview</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Gateway</th>
+                  <th>Type</th>
+                  <th>Key settings</th>
+                  <th>Code reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stripe</td>
+                  <td>Card (Elements / Payment Intents)</td>
+                  <td>Test mode toggle, publishable/secret keys per mode, webhook secret, statement descriptor.</td>
+                  <td><code>app/Services/Payment/StripeGateway.php</code></td>
+                </tr>
+                <tr>
+                  <td>PayPal</td>
+                  <td>Redirect</td>
+                  <td>Mode (sandbox/live), client ID/secret per mode, webhook ID, auto-complete toggle.</td>
+                  <td><code>app/Services/Payment/PaypalGateway.php</code></td>
+                </tr>
+                <tr>
+                  <td>Cash on Delivery</td>
+                  <td>Offline</td>
+                  <td>Title, description, delivery instructions, optional fee.</td>
+                  <td><code>app/Services/Payment/CashOnDelivery.php</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Configuration workflow</h2>
+          <ol>
+            <li>Open Kitbix Commerce → Settings → Payments.</li>
+            <li>Toggle each gateway on/off. Toggled gateways add their ID to <code>payment_methods</code> so CartService can expose them.</li>
+            <li>Enter credentials. Stripe requires keys for the active mode; PayPal needs client ID/secret per mode; COD supports optional instructions/fee.</li>
+            <li>Save to persist <code>payment_settings</code> (per gateway array) and run currency validation. If the selected currency isn’t supported, the REST request fails with a 422.</li>
+            <li>Run test checkouts: Stripe uses PaymentIntent IDs, PayPal redirects to approval URLs, COD immediately returns a pending status.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Store live credentials outside the database (constants or secrets manager) and inject them via filters if you need extra security.</div>
+          <div class="callout tip"><strong>Tip:</strong> Enable Stripe test mode while developing. The gateway exposes publishable + secret key pairs for each mode, simplifying sandboxing.</div>
+          <div class="callout tip"><strong>Tip:</strong> Document webhook endpoints. Stripe expects the Checkout URL provided in the UI, and PayPal uses the Webhook ID to verify signatures.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Mixing sandbox and live credentials. Stripe/PayPal will reject charges and SettingsController will continue returning success, leaving orders pending.</li>
+            <li>Enabling gateways that don’t support the store currency. <code>validateCurrencyGateways()</code> throws an error, so nothing is saved.</li>
+            <li>Leaving PayPal webhook ID blank while auto-complete is enabled. Pending orders never flip to processing.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Never expose secret keys on the frontend. Stripe’s publishable key is the only value returned by <code>getClientConfig()</code>. Keep secrets server-side.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

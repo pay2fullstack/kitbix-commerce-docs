@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Store Setup Overview · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="store-setup">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Store Setup / Overview</nav>
+        <div class="page-eyebrow">Store Setup</div>
+        <h1 class="page-title">Store Setup Overview</h1>
+        <p class="page-intro">Kitbix Commerce keeps every storefront control in a single Settings screen. Finish these tabs immediately after activation so shortcodes, checkout math, and emails share one source of truth.</p>
+
+        <section>
+          <h2 class="section-title">How the settings panel is organized</h2>
+          <ul class="feature-list">
+            <li><strong>Store:</strong> Currency, tax & shipping defaults, and the list of enabled gateways that CartService can expose.</li>
+            <li><strong>Layout:</strong> Template pickers for the grid, single product, cart, checkout, pagination type, and products-per-page.</li>
+            <li><strong>Brand Colors:</strong> Hex values that become CSS custom properties and cascade through every public template.</li>
+            <li><strong>Payments:</strong> Per-gateway credentials managed by PaymentManager with sandbox/live toggles.</li>
+            <li><strong>Email & SMTP:</strong> Sender identity, notification toggles, and optional SMTP credentials used by EmailNotificationService.</li>
+          </ul>
+          <p>Every panel writes into <code>kitbix_commerce_settings</code>, so backups or migrations only need that single option plus the addon table.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Implementation facts</h2>
+          <ul>
+            <li><strong>Controllers:</strong> <code>SettingsController</code> exposes the REST endpoints the React UI calls for load/save.</li>
+            <li><strong>Front end:</strong> Shortcodes like <code>[kitbix_commerce_products]</code>, <code>[kitbix_commerce_cart]</code>, and <code>[kitbix_commerce_checkout]</code> re-read settings on every render.</li>
+            <li><strong>Helpers:</strong> <code>kitbix_commerce_get_settings()</code> merges defaults with stored values, so unset fields never break the UI.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Setup sequence</h2>
+          <ol>
+            <li>Visit <em>Kitbix Commerce → Settings</em> and walk left-to-right through the tabs.</li>
+            <li>Choose the production currency and confirm each enabled gateway supports it.</li>
+            <li>Lock in layout + pagination before building menus so URLs and load-more behavior match.</li>
+            <li>Match brand colors to your theme, then verify the storefront shortcodes inherit them.</li>
+            <li>Enter payment credentials, email senders, and SMTP info, then trigger a test checkout.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Captured Settings UI showing Store, Layout, Brand Colors, Payments, and Email & SMTP tabs.</div>
+          <p class="caption">Use live captures from your staging site to replace this placeholder in production docs.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Log the final JSON export of <code>kitbix_commerce_settings</code> in your runbook so teams can diff changes quickly.</div>
+          <div class="callout tip"><strong>Tip:</strong> When cloning environments, immediately swap sender emails and API keys to sandbox values to avoid live charges.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Changing currency after publishing products—prices are not converted automatically.</li>
+            <li>Leaving SMTP disabled in production, which pushes all transactional mail through flaky host defaults.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Schedule risky changes (currency, tax rate, payment keys) during low traffic windows and retest every shortcode afterward.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

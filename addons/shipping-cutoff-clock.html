@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shipping Cutoff Clock · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-shipping-cutoff-clock">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Shipping Cutoff Clock</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Shipping Cutoff Clock</h1>
+        <p class="page-intro">Displays a live countdown telling shoppers how long they have left to qualify for today’s dispatch. Works on product, cart, and checkout pages.</p>
+
+        <section>
+          <h2 class="section-title">How the clock works</h2>
+          <ul>
+            <li><code>ShippingCutoffClockAddon</code> registers on <code>kitbix_commerce_after_product</code>, <code>kitbix_commerce_cart_before_table</code>, and <code>kitbix_commerce_checkout_after_payment_methods</code>.</li>
+            <li>The PHP layer calculates the next cutoff using <code>DateTimeImmutable</code> and local timezone from <code>wp_timezone_string()</code>.</li>
+            <li>Messages are built from the configured templates, replacing <code>{countdown}</code> and <code>{cutoff}</code> tokens.</li>
+            <li>Frontend assets (<code>shipping-cutoff-clock.css/js</code>) animate the timer and swap messaging once the countdown hits zero.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Daily Cutoff Time</td>
+                  <td><code>cutoff_time</code></td>
+                  <td>24-hour format string (e.g., 16:00). Defaults to 4:00 PM. Sanitized per request.</td>
+                </tr>
+                <tr>
+                  <td>Message (Before Cutoff)</td>
+                  <td><code>message_before</code></td>
+                  <td>Supports <code>{countdown}</code> token to show the formatted duration (e.g., “Order in {countdown} for dispatch today”).</td>
+                </tr>
+                <tr>
+                  <td>Message (After Cutoff)</td>
+                  <td><code>message_after</code></td>
+                  <td>Supports <code>{cutoff}</code> token to show the next dispatch label.</td>
+                </tr>
+                <tr>
+                  <td>Show on product pages</td>
+                  <td><code>show_on_product</code></td>
+                  <td>Checkbox. Uses shortcode detection to decide if the block renders.</td>
+                </tr>
+                <tr>
+                  <td>Show on checkout page</td>
+                  <td><code>show_on_checkout</code></td>
+                  <td>Checkbox. Requires the checkout page or shortcode.</td>
+                </tr>
+                <tr>
+                  <td>Show on cart page</td>
+                  <td><code>show_on_cart</code></td>
+                  <td>Checkbox. Renders before the cart table.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Implementation checklist</h2>
+          <ol>
+            <li>Enable the addon and set the cutoff time to match your fulfillment SLA.</li>
+            <li>Customize pre/post messages, keeping placeholders intact.</li>
+            <li>Toggle the visibility checkboxes for the contexts you want (product, cart, checkout).</li>
+            <li>Visit each page type to confirm the clock renders and the timezone is correct.</li>
+          </ol>
+          <div class="callout tip"><strong>Tip:</strong> Translate the messages via standard WordPress translation files—the addon wraps strings in <code>__()</code>.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Leaving cutoff blank—addon falls back to 16:00 but document the actual SLA for ops.</li>
+            <li>Expecting the timer on landing pages without Kitbix shortcodes; the addon only runs when cart/checkout/product contexts are detected.</li>
+            <li>Using 12-hour times ("4pm"). Stick to HH:MM to avoid parsing fallback.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> The countdown resets at midnight based on the site timezone. If you batch orders in a different timezone, adjust WordPress settings first.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

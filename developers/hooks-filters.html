@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hooks & Filters · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="hooks-filters">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Developers / Hooks & Filters</nav>
+        <div class="page-eyebrow">Developers</div>
+        <h1 class="page-title">Hooks & Filters</h1>
+        <p class="page-intro">Kitbix Commerce leans on standard WordPress actions and filters so you can extend cart, checkout, and admin flows without forking the plugin.</p>
+
+        <section>
+          <h2 class="section-title">How to work with hooks</h2>
+          <ol>
+            <li>Search the plugin for <code>do_action('kitbix_</code> or <code>apply_filters('kitbix_</code> to find insertion points.</li>
+            <li>Register callbacks from a custom (mu-)plugin on <code>plugins_loaded</code> so they load before Kitbix outputs markup.</li>
+            <li>Inspect the parameters passed to each hook. Controllers typically pass associative arrays for orders, products, or addon definitions.</li>
+            <li>Bail early when your conditions are not met (e.g., addon disabled, wrong page, insufficient capability).</li>
+            <li>Document priorities and accepted args. Hooks usually default to priority 10 but you can run earlier/later by adjusting the fourth argument.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Lifecycle hooks</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Hook</th>
+                  <th>Parameters</th>
+                  <th>Source</th>
+                  <th>Typical use</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>kitbix_commerce_product_saved</code></td>
+                  <td><code>$productId, $payload, $data</code></td>
+                  <td><code>ProductController::store()/update()</code></td>
+                  <td>Sync product data to external catalogs or bust caches.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_order_created</code></td>
+                  <td><code>$orderId, $order, $payload, $totals</code></td>
+                  <td><code>OrderController::checkout()</code>, <code>PaymentController::complete()</code></td>
+                  <td>Push new orders to ERPs, trigger fulfillment webhooks, log analytics.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_register_addons</code></td>
+                  <td><code>$registry</code></td>
+                  <td><code>AddonRegistry::registerDefaultAddons()</code></td>
+                  <td>Register custom addons implementing <code>AddonContract</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>kitbix_commerce_addon_enabled</code> (filter)</td>
+                  <td><code>$enabled, $addonDefinition</code></td>
+                  <td><code>AddonRegistry::normalizeAddon()</code></td>
+                  <td>Force-disable addons for certain tenants or users.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Frontend placement hooks</h2>
+          <p>Storefront templates expose additive regions so you never edit Twig/PHP templates directly:</p>
+          <ul>
+            <li><code>kitbix_commerce_after_product</code> – product footer (Related Products, Q&amp;A, Shipping Cutoff Clock).</li>
+            <li><code>kitbix_commerce_after_product_details</code> – under price block (Live View Counter).</li>
+            <li><code>kitbix_commerce_checkout_after_payment_methods</code> – summary area after gateways (Payment Trust Badge, notices).</li>
+            <li><code>kitbix_commerce_cart_before_table</code> – banner above the cart table.</li>
+          </ul>
+          <pre><code class="language-php">add_action('kitbix_commerce_checkout_after_payment_methods', 'myplugin_checkout_notice', 20, 3);
+
+function myplugin_checkout_notice($gateways, $settings, $currency) {
+    echo '&lt;p class="kitbix-note"&gt;' . esc_html__('Orders ship same day before 4 PM.', 'myplugin') . '&lt;/p&gt;';
+}</code></pre>
+        </section>
+
+        <section>
+          <h2 class="section-title">Data filters</h2>
+          <ul>
+            <li><code>kitbix_commerce_cart_totals</code> – modify totals array returned by <code>CheckoutTotals::calculate()</code> (add fees/discounts).</li>
+            <li><code>kitbix_commerce_payment_gateways</code> – alter the list of enabled gateways before checkout renders.</li>
+            <li><code>kitbix_commerce_addon_settings_fields</code> – extend addon settings definitions before they render in the admin.</li>
+          </ul>
+          <pre><code class="language-php">add_filter('kitbix_commerce_cart_totals', function ($totals) {
+    $totals['fees'][] = [
+        'label' =&gt; __('Cold chain packaging', 'myplugin'),
+        'amount' =&gt; 4.50,
+    ];
+    $totals['total'] += 4.50;
+    return $totals;
+});</code></pre>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Prefix callbacks (<code>myplugin_*</code>) and wrap them in classes so Composer autoloaders can locate them.</div>
+          <div class="callout tip"><strong>Tip:</strong> Always pass the <code>$accepted_args</code> value when hooks expose multiple parameters. Many Kitbix hooks pass 3-4 arguments.</div>
+          <div class="callout tip"><strong>Tip:</strong> Profile heavy callbacks with Query Monitor—hooks fire on every matching request.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Returning <code>null</code> from filters that expect the original value.</li>
+            <li>Registering hooks conditionally inside templates (they run too late). Register once during plugin load.</li>
+            <li>Assuming addons are enabled. Guard UI blocks with <code>AddonRegistry::isEnabled( 'addon_id' )</code>.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Hooks are synchronous. Avoid long-running HTTP calls—queue them asynchronously or use wp_cron for heavy jobs.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

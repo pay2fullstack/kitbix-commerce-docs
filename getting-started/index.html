@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Getting Started with Kitbix Commerce · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="getting-started">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Getting Started / Overview</nav>
+        <div class="page-eyebrow">Getting Started</div>
+        <h1 class="page-title">Getting Started with Kitbix Commerce</h1>
+        <p class="page-intro">Understand how Kitbix Commerce plugs into WordPress and which tasks to complete immediately after activation.</p>
+
+        <section>
+          <h2 class="section-title">What you will cover</h2>
+          <p>Kitbix Commerce is an opt-in layer on top of WordPress. It creates custom tables, REST routes, and a React admin SPA, so a short onboarding checklist keeps every environment stable.</p>
+          <p>Share this list with teammates and contractors so they can reproduce a healthy install on staging before touching production.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Upload or clone the kitbix-commerce folder into wp-content/plugins (or install the ZIP).</li>
+            <li>Activate the plugin via Plugins → Installed Plugins to run migrations and seed addon metadata.</li>
+            <li>Visit Kitbix Commerce → Dashboard once so the admin SPA bootstraps configuration and nonces.</li>
+            <li>Create WordPress pages for Shop, Product, Cart, and Checkout and drop in the documented shortcodes.</li>
+            <li>Flush permalinks (Settings → Permalinks → Save) to expose REST routes under /wp-json/kitbix-commerce.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Dashboard welcome panel showing onboarding checklist progress.</div>
+          <p class="caption">Replace with a real capture when the UI is finalized.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Bookmark the dashboard URL in your internal runbook to keep onboarding consistent.</div>
+          <div class="callout tip"><strong>Tip:</strong> Capture the REST base URL and nonce from dev tools if you plan to automate smoke tests.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Skipping the dashboard visit, preventing addon installers from executing.</li>
+            <li>Installing Pro addons before the free plugin is active.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Uninstalling Kitbix Commerce drops its tables—export orders and products before removing the plugin.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

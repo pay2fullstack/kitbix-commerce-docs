@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Common Issues · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="common-issues">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">FAQ / Common Issues</nav>
+        <div class="page-eyebrow">FAQ</div>
+        <h1 class="page-title">Common Issues</h1>
+        <p class="page-intro">Troubleshoot frequent problems in the free Kitbix Commerce plugin: storefront rendering, checkout, addons, analytics, and email delivery.</p>
+
+        <section>
+          <h2 class="section-title">Storefront not showing products</h2>
+          <ul>
+            <li>Confirm the page contains a Kitbix shortcode (<code>[kitbix_commerce_products]</code> or <code>[kitbix_commerce_product]</code>). The CSS/JS only loads when those shortcodes are present.</li>
+            <li>Ensure products are “Published” in wp-admin and not filtered out by category slugs in the shortcode attributes.</li>
+            <li>Flush permalinks (Settings → Permalinks → Save) if SEO plugins rewrote <code>kitbix_commerce_product</code> query vars.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Checkout stuck or empty</h2>
+          <ul>
+            <li>Open the browser console. 403 errors usually mean the REST nonce expired. Regenerate by refreshing the page or disabling aggressive caching.</li>
+            <li>Verify at least one payment gateway is enabled (Settings → Payments). <code>OrderController::checkout()</code> returns “No payment methods available” if the gateway list is empty.</li>
+            <li>Exclude the checkout URL and <code>/wp-json/kitbix-commerce/</code> path from cache/CDN proxies so POST requests reach WordPress.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Addon doesn’t render</h2>
+          <ul>
+            <li>Open Kitbix → Addons and ensure the module is toggled on. Most addon renderers bail if <code>AddonRegistry::isEnabled()</code> returns false.</li>
+            <li>Fill required settings: Live Purchase Toast needs at least one recent order, WhatsApp requires a numeric phone number, Shipping Cutoff Clock needs a cutoff time.</li>
+            <li>Check context flags—Shipping Cutoff Clock has <code>show_on_product/cart/checkout</code> checkboxes, WhatsApp respects the “display context” select.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Analytics returning zeroes</h2>
+          <ul>
+            <li>Analytics queries <code>kitbix_commerce_orders</code> and <code>kitbix_commerce_products</code>. Seed real orders in the selected date range (Last 7 Days by default).</li>
+            <li>Ensure cron/caching plugins don’t block <code>/wp-json/kitbix-commerce/v1/admin/analytics</code>. 403 responses appear in the browser console.</li>
+            <li>Check server time zone (Settings → General). Buckets use the WordPress timezone; incorrect settings make graphs look empty.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Emails not sending</h2>
+          <ul>
+            <li>Visit Settings → Email & SMTP. Confirm sender fields and notification toggles match your expectations (<code>email_send_customer_confirmation</code>, etc.).</li>
+            <li>If SMTP is enabled, verify host/port/encryption credentials are correct. <code>EmailNotificationService</code> uses PHPMailer and logs failures to <code>error_log</code>.</li>
+            <li>Resend from the order drawer after fixing deliverability to confirm <code>sendCustomerOrderConfirmation()</code> succeeds.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Keep a staging clone with the same theme/plugins so you can replay issues safely before touching production.</div>
+          <div class="callout tip"><strong>Tip:</strong> Capture console/network logs when submitting tickets—REST request URLs and status codes drastically reduce debugging time.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Editing Kitbix templates directly instead of using hooks (changes get overwritten during updates).</li>
+            <li>Deleting sample orders/products during QA—analytics, Live Purchase Toast, and Related Products rely on real data.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> When unsure, clone the site to staging and reproduce the issue there. Production experiments without backups can corrupt orders or inventory.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

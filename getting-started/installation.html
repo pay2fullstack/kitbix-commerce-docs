@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Installation Guide · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="installation">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Getting Started / Installation</nav>
+        <div class="page-eyebrow">Getting Started</div>
+        <h1 class="page-title">Installation Guide</h1>
+        <p class="page-intro">Deploy Kitbix Commerce safely on staging and production using a repeatable process.</p>
+
+        <section>
+          <h2 class="section-title">What you will cover</h2>
+          <p>Installation can be scripted via WP-CLI or performed manually through wp-admin. Pick one method and document it so future upgrades remain predictable.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Download the latest release ZIP or pull the repository into your mu-plugins stack.</li>
+            <li>Upload or copy kitbix-commerce into wp-content/plugins and ensure PHP can write to it.</li>
+            <li>Activate the plugin and monitor wp-content/debug.log for fatals.</li>
+            <li>If you track Kitbix in version control, commit admin/react-app/build so production servers do not need npm.</li>
+            <li>Smoke-test REST endpoints with curl https://example.com/wp-json/kitbix-commerce/v1/ping.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Plugin upload modal highlighting kitbix-commerce.zip.</div>
+          <p class="caption">Replace with a real capture when the UI is finalized.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use wp plugin install kitbix-commerce.zip --activate in CI for reproducible logs.</div>
+          <div class="callout tip"><strong>Tip:</strong> Install on staging first and promote both code and database after verification.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Double-nesting the plugin directory (wp-content/plugins/kitbix-commerce/kitbix-commerce).</li>
+            <li>Keeping aggressive cache/optimization plugins enabled during activation.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> If activation fails, WordPress disables the plugin automatically—fix the fatal, then reactivate to rerun installers.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

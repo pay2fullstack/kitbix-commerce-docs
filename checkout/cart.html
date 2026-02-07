@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cart Experience · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="cart">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Checkout / Cart</nav>
+        <div class="page-eyebrow">Checkout</div>
+        <h1 class="page-title">Cart Experience</h1>
+        <p class="page-intro">The cart shortcode renders a responsive table with price, quantity, and total columns plus Empty Cart and Proceed buttons. Everything runs off <code>public/templates/cart.php</code> and the JS bundle that talks to the cart REST endpoints.</p>
+
+        <section>
+          <h2 class="section-title">Template behavior</h2>
+          <ul>
+            <li><strong>Template picker:</strong> The <code>cart_template</code> setting controls modifiers <code>kitbix-commerce-cart--default|compact|minimal</code> so you can style each layout @/wp-content/plugins/kitbix-commerce/public/templates/cart.php#7-60.</li>
+            <li><strong>Table columns:</strong> Product, Price, Quantity, Total, and an action cell are hardcoded. JS fills <code>tbody[data-kitbix-commerce-cart-body]</code> after loading cart contents.</li>
+            <li><strong>Total + badge:</strong> <code>data-kitbix-commerce-cart-total</code> and the “Taxes calculated at checkout” label mirror what you see in the screenshot.</li>
+            <li><strong>Hooks:</strong> <code>do_action('kitbix_commerce_cart_before_table')</code> lets addons add reassurance UI (trust badges, urgency copy) before the table.</li>
+            <li><strong>Buttons:</strong> Empty Cart triggers the REST delete endpoint; Proceed links to the checkout page resolved via <code>kitbix_commerce_get_page_id('checkout')</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Setup workflow</h2>
+          <ol>
+            <li>Create a WordPress page (slug “cart”) containing <code>[kitbix_commerce_cart]</code>. The plugin auto-creates it on activation but you can move it anywhere.</li>
+            <li>Under Settings → Layout, select the cart template variant that matches your theme spacing.</li>
+            <li>Add CSS in your theme targeting <code>.kitbix-commerce-cart</code> and the modifier class if you need to tweak typography or table borders.</li>
+            <li>Preview with products in the cart. Confirm totals update when you change quantity, and that the Empty Cart + Proceed buttons match your design system.</li>
+            <li>Capture a screenshot (like the one above) for ops docs so teams know what “good” looks like after future edits.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Screenshot: Default Kitbix cart table with item rows, total badge, Empty Cart, and Proceed buttons.</div>
+          <p class="caption">Replace with your own staging capture when publishing docs.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Use the hook before the table to drop in policies, shipping cutoffs, or addon widgets instead of editing the template directly.</div>
+          <div class="callout tip"><strong>Tip:</strong> Keep “Taxes calculated at checkout” accurate—if you charge tax in-cart, update the copy via translation filters.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Hardcoding checkout URLs. Always pull <code>kitbix_commerce_get_page_id('checkout')</code> so multisite/localized URLs work.</li>
+            <li>Removing <code>data-kitbix-commerce-cart-body</code> or button data attributes, which breaks the JS controller.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> The cart JS persists data in <code>localStorage</code>; clear storage between theme overrides to avoid misreading regressions.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

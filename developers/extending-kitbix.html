@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Extending Kitbix · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="extending-kitbix">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Developers / Extending Kitbix</nav>
+        <div class="page-eyebrow">Developers</div>
+        <h1 class="page-title">Extending Kitbix</h1>
+        <p class="page-intro">Add features to the free Kitbix Commerce plugin without touching core files. Use hooks, addons, REST endpoints, and MU-plugins to keep upgrades painless.</p>
+
+        <section>
+          <h2 class="section-title">Extension checklist</h2>
+          <ol>
+            <li><strong>Choose the integration surface:</strong> hook (UI tweaks), addon (modular feature), REST/React (headless), or shortcode override.</li>
+            <li><strong>Prototype in a separate plugin:</strong> autoload classes via Composer or a simple PSR-4 map. Register hooks on <code>plugins_loaded</code>.</li>
+            <li><strong>Target staging first:</strong> use wp-env or a cloned site, seed data, and run regression smoke tests.</li>
+            <li><strong>Document the change:</strong> note file paths, hook names, and rollback steps; commit to VCS alongside your theme/plugin.</li>
+            <li><strong>Ship + monitor:</strong> enable feature flags or toggle addons per site when rolling updates to production.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Addons vs. hooks</h2>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>When to build an addon</h3>
+              <ul>
+                <li>You need settings surfaced in Kitbix → Addons.</li>
+                <li>You must enqueue assets, register product fields, or inject markup automatically.</li>
+                <li>Logic should toggle on/off per site without touching code.</li>
+              </ul>
+              <p>Implement <code>AddonContract</code>, register via <code>kitbix_commerce_register_addons</code>, and guard runtime logic behind <code>AddonRegistry::isEnabled()</code>.</p>
+            </article>
+            <article class="card">
+              <h3>When hooks are enough</h3>
+              <ul>
+                <li>Quick UI injections (<code>kitbix_commerce_after_product</code>, <code>kitbix_commerce_checkout_after_payment_methods</code>).</li>
+                <li>Lifecycle handlers (<code>kitbix_commerce_order_created</code>, <code>kitbix_commerce_product_saved</code>).</li>
+                <li>Cart/checkout filters (<code>kitbix_commerce_cart_totals</code>). No settings UI required.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Working with REST + JS</h2>
+          <ul>
+            <li>Use the native admin SPA components where possible. Admin routes already exist for products, orders, addons, settings, and analytics.</li>
+            <li>Register new routes by extending <code>KitbixCommerce\Controllers\Controller</code> and adding entries to <code>routes/admin.php</code> or <code>routes/public.php</code>.</li>
+            <li>Frontend React features (admin/react-app) consume Redux slices; wrap new API calls with <code>createAsyncThunk</code> patterns similar to <code>analyticsSlice.js</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Deployment patterns</h2>
+          <ul>
+            <li><strong>MU-plugins for shared logic:</strong> load enterprise-specific hooks/addons before Kitbix initializes.</li>
+            <li><strong>Composer-managed packages:</strong> publish internal addons as libraries, then require them in wp-content via path repositories.</li>
+            <li><strong>Feature flags:</strong> use options/transients to toggle risky behavior gradually. Always bail when flags are off.</li>
+            <li><strong>Testing:</strong> pair PHPUnit for service classes with Cypress/Playwright for storefront smoke tests.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Namespaces matter—follow <code>KitbixCommerce\</code> conventions or your own PSR-4 root to avoid class collisions.</div>
+          <div class="callout tip"><strong>Tip:</strong> Cache expensive API calls or queries and invalidate them via lifecycle hooks (order/product events).</div>
+          <div class="callout tip"><strong>Tip:</strong> Make custom code resilient. If Kitbix deactivates, your plugin should bail gracefully and not fatal.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Forking Kitbix core and missing security releases.</li>
+            <li>Embedding business logic inside shortcodes instead of moving it to addons/services.</li>
+            <li>Running direct SQL without <code>$wpdb-&gt;prepare()</code> or the <code>Database::table()</code> helper.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Keep extensions reversible. Track every customization in source control and note how to disable it quickly during incidents.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

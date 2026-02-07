@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Purchase Toast · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-live-purchase-toast">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Live Purchase Toast</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Live Purchase Toast</h1>
+        <p class="page-intro">Shows rotating “Someone just purchased…” toasts using recent orders fetched from <code>Order::recentWithItems()</code>. Ideal for lightweight social proof on landing and product pages.</p>
+
+        <section>
+          <h2 class="section-title">How it works</h2>
+          <ul>
+            <li>The addon registers via <code>LivePurchaseToastAddon</code> and injects hooks on <code>wp_enqueue_scripts</code> + <code>wp_footer</code>.</li>
+            <li><code>AddonRegistry::getSettings('live_purchase_toast')</code> provides the message template (defaults to “Someone in {location} purchased”).</li>
+            <li><code>Order::recentWithItems(12)</code> supplies payloads (product name, slug, featured image, and customer location parsed from the shipping address).</li>
+            <li>Assets: <code>live-purchase-toast.css</code> and <code>live-purchase-toast.js</code> render a floating stack of toasts with entry/exit animations.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Message Template</td>
+                  <td><code>message_template</code></td>
+                  <td>Text shown above the product title. Supports the <code>{location}</code> token; fallback location is “your area”.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Settings are saved inline from the Addons list through <code>AddonRegistry::updateSettings()</code>—no extra save button.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Frontend behavior</h2>
+          <ol>
+            <li>The script reads localized payloads from <code>window.KitbixPurchaseToast</code> (injected when at least one order exists).</li>
+            <li>A container <code>&lt;div data-kitbix-purchase-toast&gt;</code> is printed in the footer.</li>
+            <li>Every 11 seconds the JS selects the next payload, renders image + message, and auto-dismisses the toast after ~5 seconds.</li>
+            <li>Clicking a toast with a product slug navigates shoppers to <code>kitbix_commerce_product_permalink()</code>.</li>
+          </ol>
+          <div class="callout tip"><strong>Tip:</strong> Seed at least one manual test order per product so social proof looks real on launch day.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Testing checklist</h2>
+          <ul>
+            <li>Enable the addon in Kitbix Commerce → Addons and enter a localized message template.</li>
+            <li>Create a few orders with different cities to ensure the {location} token resolves cleanly.</li>
+            <li>Visit pages containing <code>[kitbix_commerce_products]</code>, product, cart, or checkout shortcodes—the assets load whenever storefront pages are detected.</li>
+            <li>Confirm toasts rotate, fade out, and link correctly (inspect <code>live-purchase-toast.js</code> errors if they do not).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Empty orders table → no payload → no assets enqueued. Run a staging order to populate data.</li>
+            <li>Long message templates wrapping onto multiple lines; keep them under ~60 characters.</li>
+            <li>Disabled addon toggled by automation. Use <code>AddonRegistry::isEnabled('live_purchase_toast')</code> to verify state when debugging.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> This addon only reads recent orders—if you delete orders in wp-admin, the toast queue clears until new sales arrive.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

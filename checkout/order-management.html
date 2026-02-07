@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order Management · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="order-management">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Checkout / Order Management</nav>
+        <div class="page-eyebrow">Checkout</div>
+        <h1 class="page-title">Order Management</h1>
+        <p class="page-intro">Fulfill, refund, and communicate with customers from the Kitbix admin SPA.</p>
+
+        <section>
+          <h2 class="section-title">What you will cover</h2>
+          <p>Orders live inside Kitbix tables. The React admin provides filters, bulk actions, and timeline history to keep fulfillment predictable.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Step-by-step</h2>
+          <ol>
+            <li>Open Kitbix Commerce → Orders to monitor incoming purchases.</li>
+            <li>Filter by status, payment method, or date to triage tasks.</li>
+            <li>Open an order to view timeline notes, download permissions, and resend emails.</li>
+            <li>Update statuses (processing, completed, refunded) as fulfillment progresses.</li>
+            <li>Export orders via CSV or REST when syncing with ERPs or shipping tools.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Leave timeline notes whenever manual adjustments occur.</div>
+          <div class="callout tip"><strong>Tip:</strong> Use bulk status updates only after filtering to avoid accidental mass changes.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Editing totals manually instead of issuing gateway refunds.</li>
+            <li>Neglecting to resend download permissions after replacing files.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Always verify payment status at the gateway before marking orders completed.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

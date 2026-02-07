@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout Flow · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="checkout-flow">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Checkout / Checkout Flow</nav>
+        <div class="page-eyebrow">Checkout</div>
+        <h1 class="page-title">Checkout Flow</h1>
+        <p class="page-intro">The checkout shortcode renders a three-step form: Customer Details, Order Summary, and Payment Method. All logic lives in <code>public/templates/checkout.php</code> and the bundled JS that talks to <code>OrderController::checkout()</code>.</p>
+
+        <section>
+          <h2 class="section-title">Template anatomy</h2>
+          <ul>
+            <li><strong>Layout selector:</strong> <code>checkout_template</code> applies modifier classes (<code>kitbix-commerce-checkout--default|modern|split</code>) so you can mirror the screenshot’s two-column layout @/wp-content/plugins/kitbix-commerce/public/templates/checkout.php#7-195.</li>
+            <li><strong>Data attributes:</strong> <code>data-tax-rate</code> and <code>data-shipping-flat</code> expose the values from Settings → Store. JS recalculates totals in real time.</li>
+            <li><strong>Customer details:</strong> Name, email, phone, and address fields are required out of the box (except phone). Use filters if you need to hide them.</li>
+            <li><strong>Payment methods:</strong> Radio list is populated from <code>CartService::availableGateways()</code>. Stripe injects its Elements UI inside <code>data-kitbix-commerce-stripe-wrapper</code> when selected.</li>
+            <li><strong>Order summary:</strong> The right column renders line items, subtotal, shipping, tax, and total—matching the provided screenshot.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Request lifecycle</h2>
+          <ol>
+            <li>Customer edits the form. JS stores cart contents locally and mirrors them in the summary list.</li>
+            <li>On submit, the script packages customer info, address, cart items, and selected gateway, then POSTs to <code>/kitbix-commerce/v1/checkout</code> (handled by <code>OrderController::checkout()</code>).</li>
+            <li>Server validates stock, totals, and gateway availability. If Stripe or PayPal is selected, it creates a payment intent/redirect before finalizing the order.</li>
+            <li>Successful responses trigger receipt emails (if enabled) and empty the cart, then redirect to the configured thank-you page.</li>
+          </ol>
+        </section>
+
+        <section class="screenshot">
+          <div class="screenshot__frame">Screenshot: Checkout form showing Customer Details on the left and the pinned Order Summary/Payment block on the right.</div>
+          <p class="caption">Swap with your staging capture when publishing docs.</p>
+        </section>
+
+        <section>
+          <h2 class="section-title">Tips & best practices</h2>
+          <div class="callout tip"><strong>Tip:</strong> Keep tax + shipping values inside Settings → Store, not in the template. The data attributes ensure every checkout instance stays in sync.</div>
+          <div class="callout tip"><strong>Tip:</strong> Use the <code>kitbix_commerce_checkout_after_payment_methods</code> hook to add trust badges (as shown in the screenshot) without editing template core.</div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common mistakes</h2>
+          <ul>
+            <li>Forgetting to enable at least one payment gateway—checkout will render “No payment methods available” and all orders will fail.</li>
+            <li>Changing the HTML name attributes (e.g., <code>name="email"</code>) and breaking <code>OrderController::checkout()</code> validation.</li>
+            <li>Removing <code>data-kitbix-commerce-checkout</code> from the form; the JS can’t bind submit handlers without it.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> Never expose secret keys in the template. Stripe’s client config already contains the publishable key via <code>CartService::availableGateways()</code>; keep secrets server-side.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>

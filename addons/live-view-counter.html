@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live View Counter · Kitbix Commerce Docs</title>
+    <link rel="stylesheet" href="/docs/assets/css/docs.css" />
+  </head>
+  <body data-page="addon-live-view-counter">
+    <header id="docsHeader" class="docs-header"></header>
+
+    <div class="docs-layout">
+      <aside id="docsSidebar" class="docs-sidebar"></aside>
+
+      <main class="docs-content">
+        <nav class="breadcrumbs">Addons / Live View Counter</nav>
+        <div class="page-eyebrow">Addons</div>
+        <h1 class="page-title">Live View Counter</h1>
+        <p class="page-intro">Adds urgency to product pages by injecting a dynamic "{count} people are watching" line underneath the product summary.</p>
+
+        <section>
+          <h2 class="section-title">How it works</h2>
+          <ul>
+            <li><code>LiveViewCounterAddon</code> hooks into <code>wp_enqueue_scripts</code> and <code>kitbix_commerce_after_product_details</code>.</li>
+            <li>The addon is product-only; assets only load when <code>[kitbix_commerce_product]</code> (or the query var) is present.</li>
+            <li>Counts are generated on the fly using the product ID plus the current minute (<code>generateCount()</code>) so each product gets a unique, believable number.</li>
+            <li>The markup lives in <code>views/live-view-counter.php</code> and inherits storefront typography to blend in.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Settings reference</h2>
+          <div class="table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Key</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Message Template</td>
+                  <td><code>message_template</code></td>
+                  <td>Defaults to <code>{count} people are watching this product right now</code>. The addon auto-appends <code>{count}</code> if you forget to include it.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Frontend behavior</h2>
+          <ol>
+            <li>When enabled, the addon enqueues <code>live-view-counter.css</code> and <code>live-view-counter.js</code> on product pages.</li>
+            <li>Each render passes the calculated count and template into the view.</li>
+            <li>The JS file simply handles fade-in animations; no polling occurs, so numbers stabilize after load.</li>
+            <li>The block respects <code>kitbix_commerce_after_product_details</code> priority 20, so it appears below badges but above the Q&A section.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 class="section-title">Testing checklist</h2>
+          <ul>
+            <li>Enable the addon and customize the message template.</li>
+            <li>Open several products; counts should differ per product and per minute.</li>
+            <li>Switch languages to verify <code>{count}</code> is replaced inside translated strings.</li>
+            <li>Disable the addon and confirm the block disappears immediately.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="section-title">Common pitfalls</h2>
+          <ul>
+            <li>Expecting literal real-time analytics—this addon intentionally fakes a believable range instead of querying analytics providers.</li>
+            <li>Embedding <code>{count}</code> twice in the template, producing duplicated numbers.</li>
+            <li>Trying to use it on non-product pages; hooks never run outside the product context.</li>
+          </ul>
+          <div class="callout warning"><strong>Reminder:</strong> The counter runs entirely on the frontend. If caching strips the localized script, purge your cache or add the addon handles to your cache exclusion list.</div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/docs/assets/js/docs.js" defer></script>
+  </body>
+</html>
