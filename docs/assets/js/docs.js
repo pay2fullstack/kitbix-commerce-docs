@@ -1,3 +1,15 @@
+const SEO_META = {
+  baseUrl: 'https://commerce.kitbix.com',
+  title: 'Kitbix Commerce Documentation',
+  description:
+    'Explore the official Kitbix Commerce documentation for the free plugin: setup, checkout, addons, analytics, and developer guides.',
+  image: 'https://kitbix.com/wp-content/uploads/2026/01/logo-full.png',
+  icons: {
+    small: 'https://kitbix.com/wp-content/uploads/2026/01/cropped-logo-1-1-300x300.png',
+    large: 'https://kitbix.com/wp-content/uploads/2026/01/cropped-logo-1-1-192x192.png'
+  }
+};
+
 const NAV_STRUCTURE = [
   {
     title: 'Getting Started',
@@ -120,6 +132,64 @@ const NAV_ROOTS = {
   'common-issues': 'FAQ'
 };
 
+const ensureMetaTag = (selector, attributes, tagName = 'meta') => {
+  let node = document.head.querySelector(selector);
+  if (!node) {
+    node = document.createElement(tagName);
+    document.head.appendChild(node);
+  }
+  Object.entries(attributes).forEach(([key, value]) => {
+    if (value) {
+      node.setAttribute(key, value);
+    }
+  });
+  return node;
+};
+
+const injectSeoMeta = () => {
+  if (!document.head) {
+    return;
+  }
+
+  const baseUrl = SEO_META.baseUrl.replace(/\/$/, '');
+  const path = window.location.pathname.replace(/\/+$/, '');
+  const canonicalUrl = `${baseUrl}${path || '/'}`;
+
+  ensureMetaTag('meta[name="description"]', { name: 'description', content: SEO_META.description });
+  ensureMetaTag('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl }, 'link');
+  ensureMetaTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
+  ensureMetaTag('meta[property="og:title"]', { property: 'og:title', content: SEO_META.title });
+  ensureMetaTag('meta[property="og:description"]', {
+    property: 'og:description',
+    content: SEO_META.description
+  });
+  ensureMetaTag('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
+  ensureMetaTag('meta[property="og:image"]', { property: 'og:image', content: SEO_META.image });
+  ensureMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+  ensureMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: SEO_META.title });
+  ensureMetaTag('meta[name="twitter:description"]', {
+    name: 'twitter:description',
+    content: SEO_META.description
+  });
+  ensureMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: SEO_META.image });
+  ensureMetaTag('link[rel="icon"][sizes="32x32"]', {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '32x32',
+    href: SEO_META.icons.small
+  }, 'link');
+  ensureMetaTag('link[rel="icon"][sizes="192x192"]', {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '192x192',
+    href: SEO_META.icons.large
+  }, 'link');
+  ensureMetaTag('link[rel="apple-touch-icon"]', {
+    rel: 'apple-touch-icon',
+    href: SEO_META.icons.large
+  }, 'link');
+};
+
 const renderHeader = () => {
   const header = document.getElementById('docsHeader');
   if (!header) {
@@ -178,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const body = document.body;
   const activeSlug = body.dataset.page || '';
 
+  injectSeoMeta();
   renderHeader();
   renderSidebar(activeSlug);
 
